@@ -15,6 +15,22 @@ public class CrmUser
 
 	public CrmUser() {}
 
+	public CrmUser(
+			String userName,
+			String password,
+			String matchingPassword,
+			String firstName,
+			String lastName,
+			String email)
+	{
+		this.userName = userName;
+		this.password = password;
+		this.matchingPassword = matchingPassword;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+	}
+
 	public String getUserName()
 	{
 		return userName;

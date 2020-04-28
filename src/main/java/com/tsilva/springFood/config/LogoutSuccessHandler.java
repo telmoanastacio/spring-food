@@ -1,6 +1,5 @@
 package com.tsilva.springFood.config;
 
-import com.tsilva.springFood.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;

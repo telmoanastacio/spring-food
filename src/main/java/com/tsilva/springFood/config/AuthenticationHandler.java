@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
@@ -48,6 +49,9 @@ public class AuthenticationHandler implements AuthenticationSuccessHandler, Auth
 		session.setAttribute("user", user);
 
 		response.setStatus(HttpServletResponse.SC_ACCEPTED);
+
+		CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
+		response.setHeader("_csrf", csrfToken.getToken());
 	}
 
 	@Override
@@ -56,7 +60,7 @@ public class AuthenticationHandler implements AuthenticationSuccessHandler, Auth
 			HttpServletResponse response,
 			AuthenticationException exception) throws IOException, ServletException
 	{
-		LOG.info("onAuthenticationSuccess(): Authentication Failure");
+		LOG.info("onAuthenticationSuccess(): Authentication Failure", exception);
 
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 	}

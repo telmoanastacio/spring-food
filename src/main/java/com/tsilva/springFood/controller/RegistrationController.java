@@ -12,12 +12,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Created by Telmo Silva on 27.04.2020.
  */
 
 @Controller
-@RequestMapping("/register")
 public class RegistrationController
 {
 	private static final Logger LOG = LoggerFactory.getLogger(MvcController.class);
@@ -32,11 +33,19 @@ public class RegistrationController
 		dataBinder.registerCustomEditor(String.class, stringTrimmerEditor);
 	}
 
-	@PostMapping("/processRegistrationForm")
-	public String processRegistrationFormMapping(
-			@ModelAttribute("crmUser") CrmUser crmUser,
-			Model model)
+	@RequestMapping(value = "/register", method = {RequestMethod.POST})
+	public void processRegistrationFormMapping(
+			@RequestParam("username") String username,
+			@RequestParam("password") String password,
+			@RequestParam("confirmpassword") String confirmPassword,
+			@RequestParam(value = "name", required = false) String name,
+			@RequestParam(value = "surname", required = false) String surname,
+			@RequestParam(value = "email", required = false) String email,
+			Model model,
+			HttpServletResponse response)
 	{
+		CrmUser crmUser = new CrmUser(username, password, confirmPassword, name, surname, email);
+
 		String userName = crmUser.getUserName();
 		LOG.info("processRegistrationForm(): Processing registration form for: " + userName);
 
@@ -48,13 +57,15 @@ public class RegistrationController
 			model.addAttribute("registrationError", "User name already exists.");
 
 			LOG.warn("processRegistrationForm(): User name already exists.");
-        	return "registration-form";
+
+			response.setStatus(HttpServletResponse.SC_CONFLICT);
+			return;
         }
         // create user account
         userService.save(crmUser);
 
 		LOG.info("processRegistrationForm(): Successfully created user: " + userName);
-        
-        return "registration-confirmation";		
+
+		response.setStatus(HttpServletResponse.SC_ACCEPTED);
 	}
 }
