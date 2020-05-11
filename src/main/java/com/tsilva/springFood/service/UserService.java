@@ -1,10 +1,10 @@
 package com.tsilva.springFood.service;
 
-import com.tsilva.springFood.controller.MvcController;
 import com.tsilva.springFood.dao.IRoleDao;
 import com.tsilva.springFood.dao.IUserDao;
 import com.tsilva.springFood.entity.Role;
 import com.tsilva.springFood.entity.User;
+import com.tsilva.springFood.entity.UserRole;
 import com.tsilva.springFood.user.CrmUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +19,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -58,7 +60,7 @@ public class UserService implements IUserService
 		user.setLastName(crmUser.getLastName());
 		user.setEmail(crmUser.getEmail());
 
-		user.setRoles(Arrays.asList(iRoleDao.findRoleByName("USER")));
+		user.setUserRoleRole(Arrays.asList(new UserRole(user, iRoleDao.findRoleByName("USER"))));
 
 		iUserDao.save(user);
 	}
@@ -72,8 +74,15 @@ public class UserService implements IUserService
 		{
 			throw new UsernameNotFoundException("Invalid username or password.");
 		}
+
+		List<Role> roleList = new LinkedList<>();
+		for(UserRole userRole: user.getUserRoleRole())
+		{
+			roleList.add(userRole.getRole());
+		}
+
 		return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(),
-				mapRolesToAuthorities(user.getRoles()));
+				mapRolesToAuthorities(roleList));
 	}
 
 	private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles)

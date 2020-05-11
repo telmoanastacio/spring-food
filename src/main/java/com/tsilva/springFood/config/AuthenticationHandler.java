@@ -60,7 +60,7 @@ public class AuthenticationHandler implements AuthenticationSuccessHandler, Auth
 			HttpServletResponse response,
 			AuthenticationException exception) throws IOException, ServletException
 	{
-		LOG.info("onAuthenticationSuccess(): Authentication Failure", exception);
+		LOG.info("onAuthenticationFailure(): Authentication Failure", exception);
 
 		response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 	}

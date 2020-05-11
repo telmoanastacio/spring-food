@@ -19,6 +19,29 @@ public class RoleDao implements IRoleDao
 	private SessionFactory sessionFactory;
 
 	@Override
+	public Role findRoleById(Long roleId)
+	{
+		// get the current hibernate session
+		Session currentSession = sessionFactory.getCurrentSession();
+
+		// now retrieve/read from database using name
+		Query<Role> query = currentSession.createQuery("from Role where id=:roleId", Role.class);
+		query.setParameter("roleId", roleId);
+
+		Role role = null;
+		try
+		{
+			role = query.getSingleResult();
+		}
+		catch(Exception e)
+		{
+			role = null;
+		}
+
+		return role;
+	}
+
+	@Override
 	public Role findRoleByName(String roleName)
 	{
 		// get the current hibernate session
@@ -29,7 +52,6 @@ public class RoleDao implements IRoleDao
 		query.setParameter("roleName", roleName);
 		
 		Role role = null;
-
 		try
 		{
 			role = query.getSingleResult();

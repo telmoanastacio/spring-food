@@ -8,5 +8,7 @@ import com.tsilva.springFood.entity.Role;
 
 public interface IRoleDao
 {
+	public Role findRoleById(Long roleId);
+
 	public Role findRoleByName(String roleName);
 }

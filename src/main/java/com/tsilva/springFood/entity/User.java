@@ -1,7 +1,9 @@
 package com.tsilva.springFood.entity;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * Created by Telmo Silva on 27.04.2020.
@@ -31,11 +33,10 @@ public class User
 	@Column(name = "email")
 	private String email;
 
-	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinTable(name = "users_roles", 
-	joinColumns = @JoinColumn(name = "user_id"), 
-	inverseJoinColumns = @JoinColumn(name = "role_id"))
-	private Collection<Role> roles;
+	@OneToMany(mappedBy = "user",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private Collection<UserRole> userRoleRole = new ArrayList<>();
 
 	public User() {}
 
@@ -49,14 +50,14 @@ public class User
 	}
 
 	public User(String userName, String password, String firstName, String lastName, String email,
-			Collection<Role> roles)
+			Collection<UserRole> userRoles)
 	{
 		this.userName = userName;
 		this.password = password;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
-		this.roles = roles;
+		this.userRoleRole = userRoles;
 	}
 
 	public Long getId()
@@ -89,9 +90,9 @@ public class User
 		return email;
 	}
 
-	public Collection<Role> getRoles()
+	public Collection<UserRole> getUserRoleRole()
 	{
-		return roles;
+		return userRoleRole;
 	}
 
 	public void setId(Long id)
@@ -124,16 +125,48 @@ public class User
 		this.email = email;
 	}
 
-	public void setRoles(Collection<Role> roles)
+	public void setUserRoleRole(Collection<UserRole> userRoleRole)
 	{
-		this.roles = roles;
+		this.userRoleRole = userRoleRole;
+	}
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o)
+		{
+			return true;
+		}
+		if (o == null || getClass() != o.getClass())
+		{
+			return false;
+		}
+		User user = (User) o;
+		return Objects.equals(id, user.id) &&
+				Objects.equals(userName, user.userName) &&
+				Objects.equals(password, user.password) &&
+				Objects.equals(firstName, user.firstName) &&
+				Objects.equals(lastName, user.lastName) &&
+				Objects.equals(email, user.email);
+	}
+
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(id, userName, password, firstName, lastName, email);
 	}
 
 	@Override
 	public String toString()
 	{
-		return "User{" + "id=" + id + ", userName='" + userName + '\'' + ", password='" + "*********" + '\''
-				+ ", firstName='" + firstName + '\'' + ", lastName='" + lastName + '\'' + ", email='" + email + '\''
-				+ ", roles=" + roles + '}';
+		return "User{" +
+				"id=" + id +
+				", userName='" + userName + '\'' +
+				", password='" + password + '\'' +
+				", firstName='" + firstName + '\'' +
+				", lastName='" + lastName + '\'' +
+				", email='" + email + '\'' +
+				", userRoleRole=" + userRoleRole +
+				'}';
 	}
 }
