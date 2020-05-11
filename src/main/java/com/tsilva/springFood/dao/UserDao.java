@@ -42,14 +42,30 @@ public class UserDao implements IUserDao
 	}
 
 	@Override
-	public void save(User theUser)
+	public void save(User user)
 	{
 		// get current hibernate session
 		Session currentSession = sessionFactory.getCurrentSession();
 
 		try
 		{
-			currentSession.saveOrUpdate(theUser);
+			currentSession.saveOrUpdate(user);
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void delete(User user)
+	{
+		// get current hibernate session
+		Session currentSession = sessionFactory.getCurrentSession();
+
+		try
+		{
+			currentSession.delete(user);
 		}
 		catch (Exception e)
 		{

@@ -12,7 +12,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 /**
  * Created by Telmo Silva on 27.04.2020.
@@ -33,7 +37,7 @@ public class RegistrationController
 		dataBinder.registerCustomEditor(String.class, stringTrimmerEditor);
 	}
 
-	@RequestMapping(value = "/register", method = {RequestMethod.POST})
+	@RequestMapping(value = "/register", method = {POST})
 	public void processRegistrationFormMapping(
 			@RequestParam("username") String username,
 			@RequestParam("password") String password,
@@ -67,5 +71,40 @@ public class RegistrationController
 		LOG.info("processRegistrationForm(): Successfully created user: " + userName);
 
 		response.setStatus(HttpServletResponse.SC_ACCEPTED);
+	}
+
+	@RequestMapping(value = "/delete-account", method = POST)
+	public void deleteAccountMapping(
+			@RequestParam("username") String userName,
+			HttpServletRequest request,
+			HttpServletResponse response)
+	{
+		LOG.info("deleteAccountMapping(): Processing deletion form for: " + userName);
+
+		// check the database if user already exists
+		User user = userService.findByUserName(userName);
+		if(user != null)
+		{
+			userService.delete(user);
+
+			response.setStatus(HttpServletResponse.SC_ACCEPTED);
+
+			LOG.warn("deleteAccountMapping(): Successfully deleted account.");
+
+			try
+			{
+				request.logout();
+			}
+			catch (ServletException e)
+			{
+				LOG.debug("deleteAccountMapping(): logout failed", e);
+			}
+
+			return;
+		}
+
+		LOG.info("deleteAccountMapping(): User not found.");
+
+		response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 	}
 }

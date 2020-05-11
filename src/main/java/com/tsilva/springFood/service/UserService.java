@@ -67,6 +67,13 @@ public class UserService implements IUserService
 
 	@Override
 	@Transactional
+	public void delete(User user)
+	{
+		iUserDao.delete(user);
+	}
+
+	@Override
+	@Transactional
 	public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException
     {
 		User user = iUserDao.findByUserName(userName);

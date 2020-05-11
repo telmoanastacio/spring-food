@@ -14,4 +14,6 @@ public interface IUserService extends UserDetailsService
     User findByUserName(String userName);
 
     void save(CrmUser crmUser);
+
+    void delete(User user);
 }
