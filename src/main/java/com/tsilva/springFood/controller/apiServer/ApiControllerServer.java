@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/spring-food-api")
-public class ApiController
+public class ApiControllerServer
 {
-    private static final Logger LOG = LoggerFactory.getLogger(ApiController.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ApiControllerServer.class);
 }

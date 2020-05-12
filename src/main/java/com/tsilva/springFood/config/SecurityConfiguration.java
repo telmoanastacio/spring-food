@@ -33,17 +33,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
     @Autowired
 	private LogoutSuccessHandler logoutSuccessHandler;
 
-	@Bean
+    @Bean
 	public BCryptPasswordEncoder passwordEncoder()
 	{
 		return new BCryptPasswordEncoder();
 	}
-    
-   @Override
+
+	@Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception
-   {
-        auth.authenticationProvider(authenticationProvider());
-   }
+	{
+		auth.authenticationProvider(authenticationProvider());
+	}
 	
 	@Override
 	protected void configure(HttpSecurity http) throws Exception

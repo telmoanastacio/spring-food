@@ -1,15 +1,13 @@
 package com.tsilva.springFood.controller;
 
-import com.tsilva.springFood.utils.CSRFUtils;
-import com.tsilva.springFood.utils.ResourceUtils;
+import com.tsilva.springFood.controller.apiClient.ResponseCallback;
+import com.tsilva.springFood.controller.apiClient.contract.recipeSearch.RecipeSearch;
+import com.tsilva.springFood.controller.apiClient.request.get.GetRecipeSearch;
 import com.tsilva.springFood.utils.ResponseUtils;
-import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -29,9 +27,33 @@ public class MvcController
 	@Autowired
 	private ServletContext servletContext;
 
+	@Autowired
+	private GetRecipeSearch getRecipeSearch;
+
 	@RequestMapping(value = "/", method = {RequestMethod.GET})
 	public String indexMapping()
 	{
+		// ====================
+		// remove after test
+		// ====================
+		getRecipeSearch.execute("bacalhau", new ResponseCallback<RecipeSearch>()
+		{
+			@Override
+			public void success(RecipeSearch recipeSearch)
+			{
+				System.out.println();
+			}
+
+			@Override
+			public void failure(Throwable t)
+			{
+				System.out.println();
+			}
+		});
+		// ====================
+		// ++++++++++++++++++++
+		// ====================
+
 		return "index";
 	}
 
