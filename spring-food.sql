@@ -132,7 +132,7 @@ CREATE TABLE `recipe_detail`
   `vegan` boolean DEFAULT FALSE,
   `gluten_free` boolean DEFAULT FALSE,
   `dairy_free` boolean DEFAULT FALSE,
-  `very_healty` boolean DEFAULT FALSE,
+  `very_healthy` boolean DEFAULT FALSE,
   `cheap` boolean DEFAULT FALSE,
   `very_popular` boolean DEFAULT FALSE,
   `sustainable` boolean DEFAULT FALSE,
@@ -259,7 +259,7 @@ CREATE TABLE `ingredient`
   `original_string` varchar(200) DEFAULT NULL,
   `original_name` varchar(200) DEFAULT NULL,
   `amount` double DEFAULT NULL,
-  `unit` varchar(200) DEFAULT NULL,
+  `unit` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=UTF8MB4;
 

@@ -4,7 +4,10 @@ import com.tsilva.springFood.entity.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -14,11 +17,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class UserDao implements IUserDao
 {
+	private static final Logger LOG = LoggerFactory.getLogger(UserDao.class);
+
 	// need to inject the session factory
 	@Autowired
 	private SessionFactory sessionFactory;
 
 	@Override
+	@Nullable
 	public User findByUserName(String userName)
 	{
 		// get the current hibernate session
@@ -35,7 +41,7 @@ public class UserDao implements IUserDao
 		}
 		catch(Exception e)
 		{
-			user = null;
+			LOG.debug("findByUserName(): ", e);
 		}
 
 		return user;
@@ -53,7 +59,7 @@ public class UserDao implements IUserDao
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			LOG.debug("save(): ", e);
 		}
 	}
 
@@ -69,7 +75,7 @@ public class UserDao implements IUserDao
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+			LOG.debug("delete(): ", e);
 		}
 	}
 }

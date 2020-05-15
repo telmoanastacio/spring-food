@@ -7,14 +7,14 @@ import java.util.Collection;
 import java.util.Objects;
 
 /**
- * Created by Telmo Silva on 27.04.2020.
+ * Created by Telmo Silva on 15.05.2020.
  */
 
 @Entity
-@Table(name = "role")
-public class Role implements Serializable
+@Table(name = "cuisine")
+public class Cuisine implements Serializable
 {
-	private static final long serialVersionUID = 42865132230004L;
+	private static final long serialVersionUID = 42865132230011L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,22 +24,22 @@ public class Role implements Serializable
 	@Column(name = "name")
 	private String name;
 
-	@OneToMany(mappedBy = "role",
+	@OneToMany(mappedBy = "cuisine",
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
-	private Collection<UsersRoles> userRoleUser = new ArrayList<>();
+	private Collection<RecipeDetailCuisines> recipeDetailCuisines = new ArrayList<>();
 
-	public Role() {}
+	public Cuisine() {}
 
-	public Role(String name)
+	public Cuisine(String name)
 	{
 		this.name = name;
 	}
 
-	public Role(String name, Collection<UsersRoles> usersRoles)
+	public Cuisine(String name, Collection<RecipeDetailCuisines> recipeDetailCuisines)
 	{
 		this.name = name;
-		this.userRoleUser = usersRoles;
+		this.recipeDetailCuisines = recipeDetailCuisines;
 	}
 
 	public Long getId()
@@ -52,9 +52,9 @@ public class Role implements Serializable
 		return name;
 	}
 
-	public Collection<UsersRoles> getUserRoleUser()
+	public Collection<RecipeDetailCuisines> getRecipeDetailCuisines()
 	{
-		return userRoleUser;
+		return recipeDetailCuisines;
 	}
 
 	public void setId(Long id)
@@ -67,9 +67,9 @@ public class Role implements Serializable
 		this.name = name;
 	}
 
-	public void setUserRoleUser(Collection<UsersRoles> userRoleUser)
+	public void setRecipeDetailCuisines(Collection<RecipeDetailCuisines> recipeDetailCuisines)
 	{
-		this.userRoleUser = userRoleUser;
+		this.recipeDetailCuisines = recipeDetailCuisines;
 	}
 
 	@Override
@@ -83,9 +83,9 @@ public class Role implements Serializable
 		{
 			return false;
 		}
-		Role role = (Role) o;
-		return Objects.equals(id, role.id) &&
-				Objects.equals(name, role.name);
+		Cuisine dishType = (Cuisine) o;
+		return Objects.equals(id, dishType.id) &&
+				Objects.equals(name, dishType.name);
 	}
 
 	@Override
@@ -97,10 +97,10 @@ public class Role implements Serializable
 	@Override
 	public String toString()
 	{
-		return "Role{" +
+		return "Cuisine{" +
 				"id=" + id +
 				", name='" + name + '\'' +
-				", userRoleUser=" + userRoleUser +
+				", recipeDetailCuisines=" + recipeDetailCuisines +
 				'}';
 	}
 }
