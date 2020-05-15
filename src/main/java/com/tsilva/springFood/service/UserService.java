@@ -4,7 +4,7 @@ import com.tsilva.springFood.dao.IRoleDao;
 import com.tsilva.springFood.dao.IUserDao;
 import com.tsilva.springFood.entity.Role;
 import com.tsilva.springFood.entity.User;
-import com.tsilva.springFood.entity.UserRole;
+import com.tsilva.springFood.entity.UsersRoles;
 import com.tsilva.springFood.user.CrmUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,14 +53,13 @@ public class UserService implements IUserService
 	@Transactional
 	public void save(CrmUser crmUser)
 	{
-		User user = new User();
-		user.setUserName(crmUser.getUserName());
-		user.setPassword(passwordEncoder.encode(crmUser.getPassword()));
-		user.setFirstName(crmUser.getFirstName());
-		user.setLastName(crmUser.getLastName());
-		user.setEmail(crmUser.getEmail());
+		User user = new User(crmUser.getUserName(),
+				passwordEncoder.encode(crmUser.getPassword()),
+				crmUser.getFirstName(),
+				crmUser.getLastName(),
+				crmUser.getEmail());
 
-		user.setUserRoleRole(Arrays.asList(new UserRole(user, iRoleDao.findRoleByName("USER"))));
+		user.setUsersRoles(Arrays.asList(new UsersRoles(user, iRoleDao.findRoleByName("USER"))));
 
 		iUserDao.save(user);
 	}
@@ -83,9 +82,9 @@ public class UserService implements IUserService
 		}
 
 		List<Role> roleList = new LinkedList<>();
-		for(UserRole userRole: user.getUserRoleRole())
+		for(UsersRoles usersRoles : user.getUsersRoles())
 		{
-			roleList.add(userRole.getRole());
+			roleList.add(usersRoles.getRole());
 		}
 
 		return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassword(),

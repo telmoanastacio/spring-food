@@ -1,6 +1,7 @@
 package com.tsilva.springFood.entity;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -11,8 +12,10 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "user")
-public class User
+public class User implements Serializable
 {
+	private static final long serialVersionUID = 42865132230003L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
@@ -36,7 +39,7 @@ public class User
 	@OneToMany(mappedBy = "user",
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
-	private Collection<UserRole> userRoleRole = new ArrayList<>();
+	private Collection<UsersRoles> usersRoles = new ArrayList<>();
 
 	public User() {}
 
@@ -50,14 +53,14 @@ public class User
 	}
 
 	public User(String userName, String password, String firstName, String lastName, String email,
-			Collection<UserRole> userRoles)
+			Collection<UsersRoles> usersRoles)
 	{
 		this.userName = userName;
 		this.password = password;
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
-		this.userRoleRole = userRoles;
+		this.usersRoles = usersRoles;
 	}
 
 	public Long getId()
@@ -90,9 +93,9 @@ public class User
 		return email;
 	}
 
-	public Collection<UserRole> getUserRoleRole()
+	public Collection<UsersRoles> getUsersRoles()
 	{
-		return userRoleRole;
+		return usersRoles;
 	}
 
 	public void setId(Long id)
@@ -125,9 +128,9 @@ public class User
 		this.email = email;
 	}
 
-	public void setUserRoleRole(Collection<UserRole> userRoleRole)
+	public void setUsersRoles(Collection<UsersRoles> usersRoles)
 	{
-		this.userRoleRole = userRoleRole;
+		this.usersRoles = usersRoles;
 	}
 
 	@Override
@@ -166,7 +169,7 @@ public class User
 				", firstName='" + firstName + '\'' +
 				", lastName='" + lastName + '\'' +
 				", email='" + email + '\'' +
-				", userRoleRole=" + userRoleRole +
+				", userRoleRole=" + usersRoles +
 				'}';
 	}
 }

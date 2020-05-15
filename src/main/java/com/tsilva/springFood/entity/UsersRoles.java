@@ -1,6 +1,7 @@
 package com.tsilva.springFood.entity;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -9,10 +10,12 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "users_roles")
-public class UserRole
+public class UsersRoles implements Serializable
 {
+    private static final long serialVersionUID = 42865132230002L;
+
     @EmbeddedId
-    private UserRoleId userRoleId;
+    private UsersRolesId usersRolesId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("userId")
@@ -22,18 +25,18 @@ public class UserRole
     @MapsId("roleId")
     private Role role;
 
-    private UserRole() {}
+    private UsersRoles() {}
 
-    public UserRole(User user, Role role)
+    public UsersRoles(User user, Role role)
     {
         this.user = user;
         this.role = role;
-        this.userRoleId = new UserRoleId(user.getId(), role.getId());
+        this.usersRolesId = new UsersRolesId(user.getId(), role.getId());
     }
 
-    public UserRoleId getUserRoleId()
+    public UsersRolesId getUsersRolesId()
     {
-        return userRoleId;
+        return usersRolesId;
     }
 
     public User getUser()
@@ -46,9 +49,9 @@ public class UserRole
         return role;
     }
 
-    public void setUserRoleId(UserRoleId userRoleId)
+    public void setUsersRolesId(UsersRolesId usersRolesId)
     {
-        this.userRoleId = userRoleId;
+        this.usersRolesId = usersRolesId;
     }
 
     public void setUser(User user)
@@ -72,7 +75,7 @@ public class UserRole
         {
             return false;
         }
-        UserRole that = (UserRole) o;
+        UsersRoles that = (UsersRoles) o;
         return Objects.equals(user, that.user) &&
                 Objects.equals(role, that.role);
     }
@@ -86,8 +89,8 @@ public class UserRole
     @Override
     public String toString()
     {
-        return "UserRole{" +
-                "userRoleId=" + userRoleId +
+        return "UsersRoles{" +
+                "usersRolesId=" + usersRolesId +
                 '}';
     }
 }

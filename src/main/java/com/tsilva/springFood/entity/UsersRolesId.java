@@ -10,7 +10,7 @@ import java.util.Objects;
  */
 
 @Embeddable
-public class UserRoleId implements Serializable
+public class UsersRolesId implements Serializable
 {
     private static final long serialVersionUID = 42865132230001L;
 
@@ -20,9 +20,9 @@ public class UserRoleId implements Serializable
     @Column(name = "role_id")
     private Long roleId;
 
-    private UserRoleId() {}
+    private UsersRolesId() {}
 
-    public UserRoleId(Long userId, Long roleId)
+    public UsersRolesId(Long userId, Long roleId)
     {
         this.userId = userId;
         this.roleId = roleId;
@@ -59,7 +59,7 @@ public class UserRoleId implements Serializable
         {
             return false;
         }
-        UserRoleId that = (UserRoleId) o;
+        UsersRolesId that = (UsersRolesId) o;
         return Objects.equals(userId, that.userId) &&
                 Objects.equals(roleId, that.roleId);
     }
@@ -73,7 +73,7 @@ public class UserRoleId implements Serializable
     @Override
     public String toString()
     {
-        return "UserRoleId{" +
+        return "UsersRolesId{" +
                 "userId=" + userId +
                 ", roleId=" + roleId +
                 '}';
