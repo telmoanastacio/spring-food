@@ -41,6 +41,7 @@ public class RoleDao implements IRoleDao
 		}
 		catch(Exception e)
 		{
+			currentSession.clear();
 			LOG.debug("findRoleById(): ", e);
 		}
 
@@ -65,6 +66,7 @@ public class RoleDao implements IRoleDao
 		}
 		catch(Exception e)
 		{
+			currentSession.clear();
 			LOG.debug("findRoleByName(): ", e);
 		}
 		

@@ -41,6 +41,7 @@ public class UserDao implements IUserDao
 		}
 		catch(Exception e)
 		{
+			currentSession.clear();
 			LOG.debug("findByUserName(): ", e);
 		}
 
@@ -59,6 +60,7 @@ public class UserDao implements IUserDao
 		}
 		catch (Exception e)
 		{
+			currentSession.clear();
 			LOG.debug("save(): ", e);
 		}
 	}
@@ -75,6 +77,7 @@ public class UserDao implements IUserDao
 		}
 		catch (Exception e)
 		{
+			currentSession.clear();
 			LOG.debug("delete(): ", e);
 		}
 	}

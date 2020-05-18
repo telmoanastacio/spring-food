@@ -36,8 +36,8 @@ public interface SpoonacularApiClient
      */
     @GET("recipes/{recipeId}/information")
     Call<RecipeInformation> getRecipeInformation(
-            @Query("apiKey") String spoonacularApiKey,
-            @Path("recipeId") Long recipeId);
+            @Path("recipeId") Long recipeId,
+            @Query("apiKey") String spoonacularApiKey);
 
     @GET("recipes/informationBulk")
     Call<List<RecipeInformation>> getBulkRecipeInformation(

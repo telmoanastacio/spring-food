@@ -13,5 +13,8 @@ public interface IRecipeBaseDao extends IBaseDao<RecipeBase>
     @Nullable
     public RecipeBase findByRecipeBaseName(String name);
 
+    @Nullable
+    public RecipeBase findBySpoonacularId(Long spoonacularId);
+
     public void delete(RecipeBase recipeBase);
 }

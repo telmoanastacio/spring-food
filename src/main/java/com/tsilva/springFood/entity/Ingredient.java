@@ -1,5 +1,7 @@
 package com.tsilva.springFood.entity;
 
+import com.tsilva.springFood.controller.apiClient.contract.recipeInformation.ExtendedIngredient;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,13 +18,16 @@ public class Ingredient implements Serializable
 {
 	private static final long serialVersionUID = 42865132230014L;
 
+	@Transient
+	private ExtendedIngredient extendedIngredient = null;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Long id;
 
 	@Column(name = "spoonacular_id")
-	private String spoonacularId;
+	private Long spoonacularId;
 
 	@Column(name = "aisle")
 	private String aisle;
@@ -56,11 +61,6 @@ public class Ingredient implements Serializable
 			orphanRemoval = true)
 	private Collection<RecipeDetailIngredients> recipeDetailIngredients = new ArrayList<>();
 
-	@OneToMany(mappedBy = "ingredient",
-			cascade = CascadeType.ALL,
-			orphanRemoval = true)
-	private Collection<IngredientsSteps> ingredientsSteps = new ArrayList<>();
-
 	@OneToOne(mappedBy = "ingredient",
 			orphanRemoval = true,
 			cascade = CascadeType.ALL,
@@ -79,7 +79,7 @@ public class Ingredient implements Serializable
 
 	public Ingredient() {}
 
-	public Ingredient(String spoonacularId,
+	public Ingredient(Long spoonacularId,
 		  	String aisle,
 			String image,
 			String consistency,
@@ -88,7 +88,8 @@ public class Ingredient implements Serializable
 			String originalString,
 			String originalName,
 			Double amount,
-			String unit)
+			String unit,
+			ExtendedIngredient extendedIngredient)
 	{
 		this.spoonacularId = spoonacularId;
 		this.aisle = aisle;
@@ -100,6 +101,7 @@ public class Ingredient implements Serializable
 		this.originalName = originalName;
 		this.amount = amount;
 		this.unit = unit;
+		this.extendedIngredient = extendedIngredient;
 	}
 
 	public Long getId()
@@ -107,7 +109,7 @@ public class Ingredient implements Serializable
 		return id;
 	}
 
-	public String getSpoonacularId()
+	public Long getSpoonacularId()
 	{
 		return spoonacularId;
 	}
@@ -162,9 +164,24 @@ public class Ingredient implements Serializable
 		return recipeDetailIngredients;
 	}
 
-	public Collection<IngredientsSteps> getIngredientsSteps()
+	public Measure getMeasure()
 	{
-		return ingredientsSteps;
+		return measure;
+	}
+
+	public Collection<IngredientMetaInformations> getIngredientMetaInformations()
+	{
+		return ingredientMetaInformations;
+	}
+
+	public Collection<IngredientMetas> getIngredientMetas()
+	{
+		return ingredientMetas;
+	}
+
+	public ExtendedIngredient getExtendedIngredient()
+	{
+		return extendedIngredient;
 	}
 
 	public void setId(Long id)
@@ -172,7 +189,7 @@ public class Ingredient implements Serializable
 		this.id = id;
 	}
 
-	public void setSpoonacularId(String spoonacularId)
+	public void setSpoonacularId(Long spoonacularId)
 	{
 		this.spoonacularId = spoonacularId;
 	}
@@ -227,9 +244,24 @@ public class Ingredient implements Serializable
 		this.recipeDetailIngredients = recipeDetailIngredients;
 	}
 
-	public void setIngredientsSteps(Collection<IngredientsSteps> ingredientsSteps)
+	public void setMeasure(Measure measure)
 	{
-		this.ingredientsSteps = ingredientsSteps;
+		this.measure = measure;
+	}
+
+	public void setIngredientMetaInformations(Collection<IngredientMetaInformations> ingredientMetaInformations)
+	{
+		this.ingredientMetaInformations = ingredientMetaInformations;
+	}
+
+	public void setIngredientMetas(Collection<IngredientMetas> ingredientMetas)
+	{
+		this.ingredientMetas = ingredientMetas;
+	}
+
+	public void setExtendedIngredient(ExtendedIngredient extendedIngredient)
+	{
+		this.extendedIngredient = extendedIngredient;
 	}
 
 	@Override
@@ -289,7 +321,6 @@ public class Ingredient implements Serializable
 				", amount=" + amount +
 				", unit='" + unit + '\'' +
 				", recipeDetailIngredients=" + recipeDetailIngredients +
-				", ingredientsSteps=" + ingredientsSteps +
 				'}';
 	}
 }

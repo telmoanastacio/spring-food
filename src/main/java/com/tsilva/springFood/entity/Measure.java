@@ -32,17 +32,18 @@ public class Measure implements Serializable
 	private String impUnitLong;
 
 	@OneToOne(cascade=CascadeType.ALL)
-	@JoinColumn(name="ingredient_id")
+	@JoinColumn(name = "ingredient_id")
 	private Ingredient ingredient;
 
 	public Measure() {}
 
-	public Measure(String unitShort, String unitLong, String impUnitShort, String impUnitLong)
+	public Measure(String unitShort, String unitLong, String impUnitShort, String impUnitLong, Ingredient ingredient)
 	{
 		this.unitShort = unitShort;
 		this.unitLong = unitLong;
 		this.impUnitShort = impUnitShort;
 		this.impUnitLong = impUnitLong;
+		this.ingredient = ingredient;
 	}
 
 	public Long getId()

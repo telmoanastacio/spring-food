@@ -38,6 +38,7 @@ public class StepDao implements IStepDao
         }
         catch(Exception e)
         {
+            currentSession.clear();
             LOG.debug("findById(): ", e);
         }
 
@@ -55,6 +56,7 @@ public class StepDao implements IStepDao
         }
         catch (Exception e)
         {
+            currentSession.clear();
             LOG.debug("save(): ", e);
         }
     }

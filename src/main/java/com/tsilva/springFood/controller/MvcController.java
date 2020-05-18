@@ -1,8 +1,6 @@
 package com.tsilva.springFood.controller;
 
-import com.tsilva.springFood.controller.apiClient.ResponseCallback;
-import com.tsilva.springFood.controller.apiClient.contract.recipeSearch.RecipeSearch;
-import com.tsilva.springFood.controller.apiClient.request.get.GetRecipeSearch;
+import com.tsilva.springFood.service.recipeService.IRecipeService;
 import com.tsilva.springFood.utils.ResponseUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,31 +26,12 @@ public class MvcController
 	private ServletContext servletContext;
 
 	@Autowired
-	private GetRecipeSearch getRecipeSearch;
+	private IRecipeService iRecipeService;
 
 	@RequestMapping(value = "/", method = {RequestMethod.GET})
 	public String indexMapping()
 	{
-		// ====================
-		// remove after test
-		// ====================
-		getRecipeSearch.execute("bacalhau", new ResponseCallback<RecipeSearch>()
-		{
-			@Override
-			public void success(RecipeSearch recipeSearch)
-			{
-				System.out.println();
-			}
-
-			@Override
-			public void failure(Throwable t)
-			{
-				System.out.println();
-			}
-		});
-		// ====================
-		// ++++++++++++++++++++
-		// ====================
+		iRecipeService.findByRecipeName("pizza");
 
 		return "index";
 	}

@@ -8,11 +8,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Repository;
+
+import javax.transaction.Transactional;
 
 /**
  * Created by Telmo Silva on 18.05.2020.
  */
 
+@Repository
+@Transactional
 public class RecipeBaseDao implements IRecipeBaseDao
 {
     private static final Logger LOG = LoggerFactory.getLogger(RecipeBaseDao.class);
@@ -38,7 +43,33 @@ public class RecipeBaseDao implements IRecipeBaseDao
         }
         catch(Exception e)
         {
+            currentSession.clear();
             LOG.debug("findByRecipeBaseName(): ", e);
+        }
+
+        return recipeBase;
+    }
+
+    @Override
+    @Nullable
+    public RecipeBase findBySpoonacularId(Long spoonacularId)
+    {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Query<RecipeBase> query = currentSession.createQuery(
+                "from RecipeBase where spoonacular_id=:spoonacularId",
+                RecipeBase.class);
+        query.setParameter("spoonacularId", spoonacularId);
+
+        RecipeBase recipeBase = null;
+        try
+        {
+            recipeBase = query.getSingleResult();
+        }
+        catch(Exception e)
+        {
+            currentSession.clear();
+            LOG.debug("findById(): ", e);
         }
 
         return recipeBase;
@@ -55,6 +86,7 @@ public class RecipeBaseDao implements IRecipeBaseDao
         }
         catch (Exception e)
         {
+            currentSession.clear();
             LOG.debug("delete(): ", e);
         }
     }
@@ -77,6 +109,7 @@ public class RecipeBaseDao implements IRecipeBaseDao
         }
         catch(Exception e)
         {
+            currentSession.clear();
             LOG.debug("findById(): ", e);
         }
 
@@ -94,6 +127,7 @@ public class RecipeBaseDao implements IRecipeBaseDao
         }
         catch (Exception e)
         {
+            currentSession.clear();
             LOG.debug("save(): ", e);
         }
     }

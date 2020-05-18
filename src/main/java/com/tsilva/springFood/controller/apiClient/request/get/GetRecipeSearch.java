@@ -26,8 +26,11 @@ public class GetRecipeSearch
 
     public void execute(String recipeQuery, ResponseCallback<RecipeSearch> responseCallback)
     {
-        spoonacularApiClient
-                .getRecipeSearch(ApiConfig.SPOONACULAR_API_KEY, recipeQuery, 0L, 0L)
+        spoonacularApiClient.getRecipeSearch(
+                ApiConfig.SPOONACULAR_API_KEY,
+                recipeQuery,
+                0L,
+                ApiConfig.MAXIMUM_NUMBER_OF_RECIPES_PER_REQUEST)
                 .enqueue(new Callback<RecipeSearch>()
                 {
                     @Override

@@ -250,7 +250,7 @@ DROP TABLE IF EXISTS `ingredient`;
 CREATE TABLE `ingredient`
 (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `spoonacular_id` bigint UNIQUE NOT NULL,
+  `spoonacular_id` bigint DEFAULT NULL,
   `aisle` varchar(200) DEFAULT NULL,
   `image` varchar(200) DEFAULT NULL,
   `consistency` varchar(200) DEFAULT NULL,
@@ -296,7 +296,7 @@ DROP TABLE IF EXISTS `ingredient_metas`;
 CREATE TABLE `ingredient_metas`
 (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `ingredient_id` bigint UNIQUE NOT NULL,
+  `ingredient_id` bigint NOT NULL,
   `meta` varchar(200) DEFAULT NULL,
   
   PRIMARY KEY (`id`),
@@ -317,7 +317,7 @@ DROP TABLE IF EXISTS `ingredient_meta_informations`;
 CREATE TABLE `ingredient_meta_informations`
 (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `ingredient_id` bigint UNIQUE NOT NULL,
+  `ingredient_id` bigint NOT NULL,
   `meta_information` varchar(200) DEFAULT NULL,
   
   PRIMARY KEY (`id`),
@@ -338,10 +338,10 @@ DROP TABLE IF EXISTS `measure`;
 CREATE TABLE `measure`
 (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `ingredient_id` bigint UNIQUE NOT NULL,
-  `unit_short` varchar(10) DEFAULT NULL,
+  `ingredient_id` bigint NOT NULL,
+  `unit_short` varchar(50) DEFAULT NULL,
   `unit_long` varchar(50) DEFAULT NULL,
-  `imp_unit_short` varchar(10) DEFAULT NULL,
+  `imp_unit_short` varchar(50) DEFAULT NULL,
   `imp_unit_long` varchar(50) DEFAULT NULL,
   
   PRIMARY KEY (`id`),
@@ -390,30 +390,6 @@ CREATE TABLE `recipe_detail_steps`
   ON DELETE NO ACTION ON UPDATE NO ACTION,
   
   CONSTRAINT `FK_STEPS` FOREIGN KEY (`step_id`) 
-  REFERENCES `step` (`id`) 
-  ON DELETE NO ACTION ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;
-
---
--- Table structure for table `ingredients_steps`
---
-
-DROP TABLE IF EXISTS `ingredients_steps`;
-
-CREATE TABLE `ingredients_steps`
-(
-  `ingredient_id` bigint NOT NULL,
-  `step_id` bigint NOT NULL,
-  
-  PRIMARY KEY (`ingredient_id`,`step_id`),
-  
-  KEY `FK_STEP_idx` (`step_id`),
-  
-  CONSTRAINT `FK_INGREDIENT` FOREIGN KEY (`ingredient_id`) 
-  REFERENCES `ingredient` (`id`) 
-  ON DELETE NO ACTION ON UPDATE NO ACTION,
-  
-  CONSTRAINT `FK_STEPS_IS` FOREIGN KEY (`step_id`) 
   REFERENCES `step` (`id`) 
   ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=UTF8MB4;

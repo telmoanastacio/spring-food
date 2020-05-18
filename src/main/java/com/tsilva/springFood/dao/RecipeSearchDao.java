@@ -8,11 +8,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Repository;
 
 /**
  * Created by Telmo Silva on 18.05.2020.
  */
 
+@Repository
 public class RecipeSearchDao implements IRecipeSearchDao
 {
     private static final Logger LOG = LoggerFactory.getLogger(RecipeSearchDao.class);
@@ -38,6 +40,7 @@ public class RecipeSearchDao implements IRecipeSearchDao
         }
         catch(Exception e)
         {
+            currentSession.clear();
             LOG.debug("findByRecipeSearchName(): ", e);
         }
 
@@ -62,6 +65,7 @@ public class RecipeSearchDao implements IRecipeSearchDao
         }
         catch(Exception e)
         {
+            currentSession.clear();
             LOG.debug("findById(): ", e);
         }
 
@@ -79,6 +83,7 @@ public class RecipeSearchDao implements IRecipeSearchDao
         }
         catch (Exception e)
         {
+            currentSession.clear();
             LOG.debug("save(): ", e);
         }
     }

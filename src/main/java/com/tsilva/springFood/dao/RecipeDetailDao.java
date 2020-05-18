@@ -8,11 +8,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Repository;
+
+import javax.transaction.Transactional;
 
 /**
  * Created by Telmo Silva on 18.05.2020.
  */
 
+@Repository
+@Transactional
 public class RecipeDetailDao implements IRecipeDetailDao
 {
     private static final Logger LOG = LoggerFactory.getLogger(RecipeDetailDao.class);
@@ -38,6 +43,7 @@ public class RecipeDetailDao implements IRecipeDetailDao
         }
         catch(Exception e)
         {
+            currentSession.clear();
             LOG.debug("findById(): ", e);
         }
 
@@ -55,6 +61,7 @@ public class RecipeDetailDao implements IRecipeDetailDao
         }
         catch (Exception e)
         {
+            currentSession.clear();
             LOG.debug("save(): ", e);
         }
     }

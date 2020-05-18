@@ -19,7 +19,7 @@ public class RecipeDetailCuisines implements Serializable
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("recipeDetailId")
-    private RecipeDetail recipeDetail;
+    private RecipeDetail recipe_detail;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("cuisineId")
@@ -29,7 +29,7 @@ public class RecipeDetailCuisines implements Serializable
 
     public RecipeDetailCuisines(RecipeDetail recipeDetail, Cuisine cuisine)
     {
-        this.recipeDetail = recipeDetail;
+        this.recipe_detail = recipeDetail;
         this.cuisine = cuisine;
         this.recipeDetailCuisinesId = new RecipeDetailCuisinesId(recipeDetail.getId(), cuisine.getId());
     }
@@ -41,7 +41,7 @@ public class RecipeDetailCuisines implements Serializable
 
     public RecipeDetail getRecipeDetail()
     {
-        return recipeDetail;
+        return recipe_detail;
     }
 
     public Cuisine getCuisine()
@@ -56,7 +56,7 @@ public class RecipeDetailCuisines implements Serializable
 
     public void setRecipeDetail(RecipeDetail recipeDetail)
     {
-        this.recipeDetail = recipeDetail;
+        this.recipe_detail = recipeDetail;
     }
 
     public void setCuisine(Cuisine cuisine)
@@ -76,14 +76,14 @@ public class RecipeDetailCuisines implements Serializable
             return false;
         }
         RecipeDetailCuisines that = (RecipeDetailCuisines) o;
-        return Objects.equals(recipeDetail, that.recipeDetail) &&
+        return Objects.equals(recipe_detail, that.recipe_detail) &&
                 Objects.equals(cuisine, that.cuisine);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(recipeDetail, cuisine);
+        return Objects.hash(recipe_detail, cuisine);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class RecipeDetailCuisines implements Serializable
     {
         return "RecipeDetailCuisines{" +
                 "recipeDetailCuisinesId=" + recipeDetailCuisinesId +
-                ", recipeDetail=" + recipeDetail +
+                ", recipeDetail=" + recipe_detail +
                 ", cuisine=" + cuisine +
                 '}';
     }

@@ -22,7 +22,7 @@ public class RecipeDetailSteps implements Serializable
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("recipeDetailId")
-    private RecipeDetail recipeDetail;
+    private RecipeDetail recipe_detail;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("stepId")
@@ -33,9 +33,9 @@ public class RecipeDetailSteps implements Serializable
     public RecipeDetailSteps(Long recipeOptionId, RecipeDetail recipeDetail, Step step)
     {
         this.recipeOptionId = recipeOptionId;
-        this.recipeDetail = recipeDetail;
+        this.recipe_detail = recipeDetail;
         this.step = step;
-        this.recipeDetailStepsId = new RecipeDetailStepsId(recipeDetail.getId(), recipeDetailStepsId.getStepId());
+        this.recipeDetailStepsId = new RecipeDetailStepsId(recipeDetail.getId(), step.getId());
     }
 
     public RecipeDetailStepsId getRecipeDetailStepsId()
@@ -50,7 +50,7 @@ public class RecipeDetailSteps implements Serializable
 
     public RecipeDetail getRecipeDetail()
     {
-        return recipeDetail;
+        return recipe_detail;
     }
 
     public Step getStep()
@@ -70,7 +70,7 @@ public class RecipeDetailSteps implements Serializable
 
     public void setRecipeDetail(RecipeDetail recipeDetail)
     {
-        this.recipeDetail = recipeDetail;
+        this.recipe_detail = recipeDetail;
     }
 
     public void setStep(Step step)
@@ -91,14 +91,14 @@ public class RecipeDetailSteps implements Serializable
         }
         RecipeDetailSteps that = (RecipeDetailSteps) o;
         return Objects.equals(recipeOptionId, that.recipeOptionId) &&
-                Objects.equals(recipeDetail, that.recipeDetail) &&
+                Objects.equals(recipe_detail, that.recipe_detail) &&
                 Objects.equals(step, that.step);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(recipeOptionId, recipeDetail, step);
+        return Objects.hash(recipeOptionId, recipe_detail, step);
     }
 
     @Override
@@ -107,7 +107,7 @@ public class RecipeDetailSteps implements Serializable
         return "RecipeDetailSteps{" +
                 "recipeDetailStepsId=" + recipeDetailStepsId +
                 ", recipeOptionId=" + recipeOptionId +
-                ", recipeDetail=" + recipeDetail +
+                ", recipeDetail=" + recipe_detail +
                 ", step=" + step +
                 '}';
     }

@@ -19,9 +19,11 @@ public class RecipeInformation
     public Long weightWatcherSmartPoints;
     public String gaps;
     public Boolean lowFodmap;
+    public Long preparationMinutes;
+    public Long cookingMinutes;
     public Long aggregateLikes;
-    public Long spoonacularScore;
-    public Long healthScore;
+    public Double spoonacularScore;
+    public Double healthScore;
     public String creditsText;
     public String license;
     public String sourceName;
@@ -42,5 +44,6 @@ public class RecipeInformation
     public WinePairing winePairing;
     public String instructions;
     public List<AnalyzedInstruction> analyzedInstructions;
-    public String originalId;
+    public Long originalId;
+    public String spoonacularSourceUrl;
 }

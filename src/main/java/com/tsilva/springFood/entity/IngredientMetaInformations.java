@@ -23,7 +23,7 @@ public class IngredientMetaInformations implements Serializable
 	private String metaInformation;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@MapsId("ingredient_id")
+	@JoinColumn(name = "ingredient_id")
 	private Ingredient ingredient;
 
 	public IngredientMetaInformations() {}
