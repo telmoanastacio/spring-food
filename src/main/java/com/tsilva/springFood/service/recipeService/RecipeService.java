@@ -10,11 +10,14 @@ import com.tsilva.springFood.controller.apiClient.request.get.GetBulkRecipeInfor
 import com.tsilva.springFood.controller.apiClient.request.get.GetRecipeSearch;
 import com.tsilva.springFood.dao.*;
 import com.tsilva.springFood.entity.*;
+import com.tsilva.springFood.events.findByRecipeNameCompletion.FindByRecipeNameCompletionEvent;
+import com.tsilva.springFood.events.findByRecipeNameCompletion.FindByRecipeNameCompletionEventPublisher;
 import com.tsilva.springFood.utils.TimeUtils;
 import org.apache.taglibs.standard.tag.common.core.NullAttributeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -26,7 +29,7 @@ import java.util.*;
  */
 
 @Service
-public class RecipeService implements IRecipeService
+public class RecipeService implements IRecipeService, ApplicationListener<FindByRecipeNameCompletionEvent>
 {
     private static final Logger LOG = LoggerFactory.getLogger(RecipeService.class);
 
@@ -65,6 +68,16 @@ public class RecipeService implements IRecipeService
 
     @Autowired
     private ICuisineDao iCuisineDao;
+
+    @Autowired
+    private FindByRecipeNameCompletionEventPublisher findByRecipeNameCompletionEventPublisher;
+
+    //TODO: remove
+    @Override
+    public void onApplicationEvent(FindByRecipeNameCompletionEvent event)
+    {
+        System.out.println(event);
+    }
 
     @Override
     public List<RecipeBase> findByRecipeName(String recipeName)
@@ -242,6 +255,14 @@ public class RecipeService implements IRecipeService
                             iRecipeSearchDao.save(rs);
 
                             LOG.debug("All was update successfully");
+
+                            FindByRecipeNameCompletionEvent findByRecipeNameCompletionEvent =
+                                    new FindByRecipeNameCompletionEvent(
+                                            this,
+                                            true,
+                                            offset[0],
+                                            recipeAmount[0]);
+                            findByRecipeNameCompletionEventPublisher.publishEvent(findByRecipeNameCompletionEvent);
                         }
                     }
 
@@ -255,6 +276,14 @@ public class RecipeService implements IRecipeService
                         iRecipeSearchDao.save(rs);
 
                         LOG.debug("GetBulkRecipeInformation.execute().failure()", t);
+
+                        FindByRecipeNameCompletionEvent findByRecipeNameCompletionEvent =
+                                new FindByRecipeNameCompletionEvent(
+                                        this,
+                                        false,
+                                        offset[0],
+                                        recipeAmount[0]);
+                        findByRecipeNameCompletionEventPublisher.publishEvent(findByRecipeNameCompletionEvent);
                     }
                 });
             }
@@ -269,6 +298,14 @@ public class RecipeService implements IRecipeService
                 iRecipeSearchDao.save(rs);
 
                 LOG.debug("GetRecipeSearch.execute().failure()", t);
+
+                FindByRecipeNameCompletionEvent findByRecipeNameCompletionEvent =
+                        new FindByRecipeNameCompletionEvent(
+                                this,
+                                false,
+                                offset[0],
+                                recipeAmount[0]);
+                findByRecipeNameCompletionEventPublisher.publishEvent(findByRecipeNameCompletionEvent);
             }
         });
     }

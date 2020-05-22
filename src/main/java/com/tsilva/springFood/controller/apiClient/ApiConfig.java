@@ -16,7 +16,7 @@ public class ApiConfig
     // 818da5ec867b45888f1a243c1e7e36a6
     // 12f1e330bead4c11a6150012ef62a9af
     // 26036fddee1d45ef8bb1ea274ccba169
-    public static final String SPOONACULAR_API_KEY = "818da5ec867b45888f1a243c1e7e36a6";
+    public static final String SPOONACULAR_API_KEY = "12f1e330bead4c11a6150012ef62a9af";
     public static final String SPOONACULAR_API_ENDPOINT = "https://api.spoonacular.com/";
     public static final long MAXIMUM_NUMBER_OF_RECIPES_PER_REQUEST = 100L;
     public static final int WAIT_AFTER_SUCCESSFUL_SEARCH_SECONDS = 30 * 24 * 3600;
