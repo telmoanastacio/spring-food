@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * Created by Telmo Silva on 18.05.2020.
  */
@@ -45,6 +48,54 @@ public class CuisineDao implements ICuisineDao
         }
 
         return cuisine;
+    }
+
+    @Override
+    @Nullable
+    public Collection<Cuisine> findRecipeDetailCuisines(Collection<Long> cuisineIdCollection)
+    {
+        if(cuisineIdCollection == null || cuisineIdCollection.isEmpty())
+        {
+            return null;
+        }
+
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("");
+        sb.append("from Cuisine where (");
+
+        boolean isFirst = true;
+        for(Long cuisineId: cuisineIdCollection)
+        {
+            if(isFirst)
+            {
+                sb.append("id=");
+            }
+            else
+            {
+                sb.append(" or id=");
+            }
+            sb.append(cuisineId);
+
+            isFirst = false;
+        }
+        sb.append(")");
+
+        Query<Cuisine> query = currentSession.createQuery(sb.toString(), Cuisine.class);
+
+        List<Cuisine> cuisineList = null;
+        try
+        {
+            cuisineList = query.getResultList();
+        }
+        catch(Exception e)
+        {
+            currentSession.clear();
+            LOG.debug("findRecipeDetailCuisines(): ", e);
+        }
+
+        return cuisineList;
     }
 
     @Override

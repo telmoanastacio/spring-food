@@ -39,6 +39,36 @@ public class IngredientMetaInformations implements Serializable
 		this.ingredient = ingredient;
 	}
 
+	public Long getId()
+	{
+		return id;
+	}
+
+	public String getMetaInformation()
+	{
+		return metaInformation;
+	}
+
+	public Ingredient getIngredient()
+	{
+		return ingredient;
+	}
+
+	public void setId(Long id)
+	{
+		this.id = id;
+	}
+
+	public void setMetaInformation(String metaInformation)
+	{
+		this.metaInformation = metaInformation;
+	}
+
+	public void setIngredient(Ingredient ingredient)
+	{
+		this.ingredient = ingredient;
+	}
+
 	@Override
 	public boolean equals(Object o)
 	{

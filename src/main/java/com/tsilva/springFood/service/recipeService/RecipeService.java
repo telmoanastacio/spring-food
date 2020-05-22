@@ -8,6 +8,7 @@ import com.tsilva.springFood.controller.apiClient.contract.recipeInformation.Rec
 import com.tsilva.springFood.controller.apiClient.contract.recipeSearch.Result;
 import com.tsilva.springFood.controller.apiClient.request.get.GetBulkRecipeInformation;
 import com.tsilva.springFood.controller.apiClient.request.get.GetRecipeSearch;
+import com.tsilva.springFood.controller.apiServer.contract.recipeBaseSearchResponse.RecipeBaseSearchResponse;
 import com.tsilva.springFood.dao.*;
 import com.tsilva.springFood.entity.*;
 import com.tsilva.springFood.events.findByRecipeNameCompletion.FindByRecipeNameCompletionEvent;
@@ -17,10 +18,10 @@ import org.apache.taglibs.standard.tag.common.core.NullAttributeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.*;
 
@@ -29,7 +30,7 @@ import java.util.*;
  */
 
 @Service
-public class RecipeService implements IRecipeService, ApplicationListener<FindByRecipeNameCompletionEvent>
+public class RecipeService implements IRecipeService
 {
     private static final Logger LOG = LoggerFactory.getLogger(RecipeService.class);
 
@@ -72,15 +73,8 @@ public class RecipeService implements IRecipeService, ApplicationListener<FindBy
     @Autowired
     private FindByRecipeNameCompletionEventPublisher findByRecipeNameCompletionEventPublisher;
 
-    //TODO: remove
     @Override
-    public void onApplicationEvent(FindByRecipeNameCompletionEvent event)
-    {
-        System.out.println(event);
-    }
-
-    @Override
-    public List<RecipeBase> findByRecipeName(String recipeName)
+    public void findByRecipeName(String recipeName, DeferredResult<RecipeBaseSearchResponse> deferredResult)
     {
         Date now = TimeUtils.now();
 
@@ -94,16 +88,24 @@ public class RecipeService implements IRecipeService, ApplicationListener<FindBy
             if(recipeSearch.getSuccessfulIteration()
                     && !isOldSearch(now, TimeUtils.dateFromTimeStamp(recipeSearch.getUpdateTimeStamp())))
             {
+                FindByRecipeNameCompletionEvent findByRecipeNameCompletionEvent =
+                        new FindByRecipeNameCompletionEvent(
+                                this,
+                                recipeName,
+                                true,
+                                0L,
+                                0L,
+                                deferredResult);
+                findByRecipeNameCompletionEventPublisher.publishEvent(findByRecipeNameCompletionEvent);
+
                 LOG.debug("findByRecipeName() RecipeSearch not old enough to allow another search");
-                return null;
+                return;
             }
         }
         iRecipeSearchDao.save(recipeSearch);
 
         List<RecipeBase> recipeBaseList = new LinkedList<>();
-        findByRecipeName(recipeName, new Long[]{0L}, new Long[]{0L}, recipeBaseList, recipeSearch);
-
-        return recipeBaseList;
+        findByRecipeName(recipeName, new Long[]{0L}, new Long[]{0L}, recipeBaseList, recipeSearch, deferredResult);
     }
 
     private boolean isOldSearch(@NonNull Date now, @NonNull Date recipeSearchDate)
@@ -125,7 +127,8 @@ public class RecipeService implements IRecipeService, ApplicationListener<FindBy
             final Long[] offset,
             final Long[] recipeAmount,
             List<RecipeBase> recipeBaseList,
-            RecipeSearch rs)
+            RecipeSearch rs,
+            DeferredResult<RecipeBaseSearchResponse> deferredResult)
     {
         getRecipeSearch.execute(
                 recipeName,
@@ -143,6 +146,16 @@ public class RecipeService implements IRecipeService, ApplicationListener<FindBy
                 }
                 else
                 {
+                    FindByRecipeNameCompletionEvent findByRecipeNameCompletionEvent =
+                            new FindByRecipeNameCompletionEvent(
+                                    this,
+                                    recipeName,
+                                    false,
+                                    offset[0],
+                                    recipeAmount[0],
+                                    deferredResult);
+                    findByRecipeNameCompletionEventPublisher.publishEvent(findByRecipeNameCompletionEvent);
+
                     LOG.debug("findByRecipeName() couldn't find totalResults");
                     return;
                 }
@@ -157,8 +170,24 @@ public class RecipeService implements IRecipeService, ApplicationListener<FindBy
                 {
                     offset[0] = rsOffset;
 
-                    findByRecipeName(recipeName, offset, recipeAmount, recipeBaseList, rs);
+                    findByRecipeName(recipeName, offset, recipeAmount, recipeBaseList, rs, deferredResult);
                     LOG.debug("findByRecipeName() offset not 0. Starting from " + rsOffset);
+                    return;
+                }
+
+                if(recipeSearch.results.isEmpty())
+                {
+                    FindByRecipeNameCompletionEvent findByRecipeNameCompletionEvent =
+                            new FindByRecipeNameCompletionEvent(
+                                    this,
+                                    recipeName,
+                                    false,
+                                    offset[0],
+                                    recipeAmount[0],
+                                    deferredResult);
+                    findByRecipeNameCompletionEventPublisher.publishEvent(findByRecipeNameCompletionEvent);
+
+                    LOG.debug("findByRecipeName() couldn't find any recipe with the name: " + recipeName);
                     return;
                 }
 
@@ -244,7 +273,7 @@ public class RecipeService implements IRecipeService, ApplicationListener<FindBy
                         }
                         if(offset[0] < recipeAmount[0])
                         {
-                            findByRecipeName(recipeName, offset, recipeAmount, recipeBaseList, rs);
+                            findByRecipeName(recipeName, offset, recipeAmount, recipeBaseList, rs, deferredResult);
                         }
                         else    // all successfully update
                         {
@@ -259,9 +288,11 @@ public class RecipeService implements IRecipeService, ApplicationListener<FindBy
                             FindByRecipeNameCompletionEvent findByRecipeNameCompletionEvent =
                                     new FindByRecipeNameCompletionEvent(
                                             this,
+                                            recipeName,
                                             true,
                                             offset[0],
-                                            recipeAmount[0]);
+                                            recipeAmount[0],
+                                            deferredResult);
                             findByRecipeNameCompletionEventPublisher.publishEvent(findByRecipeNameCompletionEvent);
                         }
                     }
@@ -280,9 +311,11 @@ public class RecipeService implements IRecipeService, ApplicationListener<FindBy
                         FindByRecipeNameCompletionEvent findByRecipeNameCompletionEvent =
                                 new FindByRecipeNameCompletionEvent(
                                         this,
+                                        recipeName,
                                         false,
                                         offset[0],
-                                        recipeAmount[0]);
+                                        recipeAmount[0],
+                                        deferredResult);
                         findByRecipeNameCompletionEventPublisher.publishEvent(findByRecipeNameCompletionEvent);
                     }
                 });
@@ -291,20 +324,25 @@ public class RecipeService implements IRecipeService, ApplicationListener<FindBy
             @Override
             public void failure(Throwable t)
             {
-                rs.setUpdateTimeStamp(TimeUtils.now().getTime());
-                rs.setOffset(offset[0]);
-                rs.setSuccessfulIteration(false);
+                if(offset[0] != 0)
+                {
+                    rs.setUpdateTimeStamp(TimeUtils.now().getTime());
+                    rs.setOffset(offset[0]);
+                    rs.setSuccessfulIteration(false);
 
-                iRecipeSearchDao.save(rs);
+                    iRecipeSearchDao.save(rs);
+                }
 
                 LOG.debug("GetRecipeSearch.execute().failure()", t);
 
                 FindByRecipeNameCompletionEvent findByRecipeNameCompletionEvent =
                         new FindByRecipeNameCompletionEvent(
                                 this,
+                                recipeName,
                                 false,
                                 offset[0],
-                                recipeAmount[0]);
+                                recipeAmount[0],
+                                deferredResult);
                 findByRecipeNameCompletionEventPublisher.publishEvent(findByRecipeNameCompletionEvent);
             }
         });

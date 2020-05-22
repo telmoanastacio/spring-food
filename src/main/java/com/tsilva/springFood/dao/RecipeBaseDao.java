@@ -11,6 +11,7 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 /**
  * Created by Telmo Silva on 18.05.2020.
@@ -73,6 +74,36 @@ public class RecipeBaseDao implements IRecipeBaseDao
         }
 
         return recipeBase;
+    }
+
+    @Override
+    @Nullable
+    public List<RecipeBase> findRecipesByNameLike(String name)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append('%');
+        sb.append(name);
+        sb.append('%');
+
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Query<RecipeBase> query = currentSession.createQuery(
+                "from RecipeBase where title like:name",
+                RecipeBase.class);
+        query.setParameter("name", sb.toString());
+
+        List<RecipeBase> recipeBaseList = null;
+        try
+        {
+            recipeBaseList = query.getResultList();
+        }
+        catch(Exception e)
+        {
+            currentSession.clear();
+            LOG.debug("findRecipesByNameLike(): ", e);
+        }
+
+        return recipeBaseList;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.tsilva.springFood.dao;
 
 import com.tsilva.springFood.entity.Ingredient;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -11,6 +12,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by Telmo Silva on 18.05.2020.
@@ -48,6 +51,60 @@ public class IngredientDao implements IIngredientDao
         }
 
         return ingredient;
+    }
+
+    @Override
+    @Nullable
+    public Collection<Ingredient> findRecipeDetailIngredients(Collection<Long> ingredientIdCollection)
+    {
+        if(ingredientIdCollection == null || ingredientIdCollection.isEmpty())
+        {
+            return null;
+        }
+
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("");
+        sb.append("from Ingredient where (");
+
+        boolean isFirst = true;
+        for(Long ingredientId: ingredientIdCollection)
+        {
+            if(isFirst)
+            {
+                sb.append("id=");
+            }
+            else
+            {
+                sb.append(" or id=");
+            }
+            sb.append(ingredientId);
+
+            isFirst = false;
+        }
+        sb.append(")");
+
+        Query<Ingredient> query = currentSession.createQuery(sb.toString(), Ingredient.class);
+
+        List<Ingredient> ingredientList = null;
+        try
+        {
+            ingredientList = query.getResultList();
+
+            for(Ingredient ingredient: ingredientList)
+            {
+                Hibernate.initialize(ingredient.getIngredientMetas());
+                Hibernate.initialize(ingredient.getIngredientMetaInformations());
+            }
+        }
+        catch(Exception e)
+        {
+            currentSession.clear();
+            LOG.debug("findRecipeDetailIngredients(): ", e);
+        }
+
+        return ingredientList;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.tsilva.springFood.controller;
 
-import com.tsilva.springFood.service.recipeService.IRecipeService;
 import com.tsilva.springFood.utils.ResponseUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,14 +24,9 @@ public class MvcController
 	@Autowired
 	private ServletContext servletContext;
 
-	@Autowired
-	private IRecipeService iRecipeService;
-
 	@RequestMapping(value = "/", method = {RequestMethod.GET})
-	public String indexMapping()
+	public String indexMapping(HttpServletResponse response)
 	{
-		iRecipeService.findByRecipeName("tortellini");
-
 		return "index";
 	}
 

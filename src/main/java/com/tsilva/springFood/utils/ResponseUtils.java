@@ -1,6 +1,9 @@
 package com.tsilva.springFood.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jsoup.nodes.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.util.StreamUtils;
@@ -18,6 +21,8 @@ import java.io.OutputStream;
 
 public class ResponseUtils
 {
+    private static final Logger LOG = LoggerFactory.getLogger(ResponseUtils.class);
+
     public static void streamHtml(HttpServletResponse response, String htmlStr)
     {
         if(response == null || htmlStr == null)
@@ -34,7 +39,7 @@ public class ResponseUtils
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            LOG.debug("streamHtml()", e);
         }
         finally
         {
@@ -47,7 +52,7 @@ public class ResponseUtils
             }
             catch (IOException e)
             {
-                e.printStackTrace();
+                LOG.debug("streamHtml()", e);
             }
         }
     }
@@ -68,7 +73,7 @@ public class ResponseUtils
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            LOG.debug("streamHtml()", e);
         }
         finally
         {
@@ -81,7 +86,7 @@ public class ResponseUtils
             }
             catch (IOException e)
             {
-                e.printStackTrace();
+                LOG.debug("streamHtml()", e);
             }
 
             try
@@ -90,7 +95,7 @@ public class ResponseUtils
             }
             catch (IOException e)
             {
-                e.printStackTrace();
+                LOG.debug("streamHtml()", e);
             }
         }
     }
@@ -111,7 +116,7 @@ public class ResponseUtils
         }
         catch (IOException e)
         {
-            e.printStackTrace();
+            LOG.debug("streamText()", e);
         }
         finally
         {
@@ -124,7 +129,7 @@ public class ResponseUtils
             }
             catch (IOException e)
             {
-                e.printStackTrace();
+                LOG.debug("streamText()", e);
             }
         }
     }
@@ -151,5 +156,41 @@ public class ResponseUtils
         CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
 
         streamText(response, csrfToken.getToken());
+    }
+
+    public static void streamObjectAsJson(HttpServletResponse response, Object o)
+    {
+        if(response == null || o == null)
+        {
+            return;
+        }
+
+        OutputStream os = null;
+        try
+        {
+            os = response.getOutputStream();
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.writeValue(os, o);
+        }
+        catch (IOException e)
+        {
+            LOG.debug("streamObjectAsJson()", e);
+        }
+        finally
+        {
+            try
+            {
+                if (os != null)
+                {
+                    os.close();
+                }
+            }
+            catch (IOException e)
+            {
+                LOG.debug("streamObjectAsJson()", e);
+            }
+        }
     }
 }

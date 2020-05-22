@@ -1,6 +1,6 @@
 package com.tsilva.springFood.dao;
 
-import com.tsilva.springFood.entity.RecipeDetail;
+import com.tsilva.springFood.entity.*;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -11,6 +11,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
 import javax.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Telmo Silva on 18.05.2020.
@@ -24,6 +26,18 @@ public class RecipeDetailDao implements IRecipeDetailDao
 
     @Autowired
     private SessionFactory sessionFactory;
+
+    @Autowired
+    private IDishTypeDao iDishTypeDao;
+
+    @Autowired
+    private ICuisineDao iCuisineDao;
+
+    @Autowired
+    private IStepDao iStepDao;
+
+    @Autowired
+    private IIngredientDao iIngredientDao;
 
     @Override
     @Nullable
@@ -45,6 +59,85 @@ public class RecipeDetailDao implements IRecipeDetailDao
         {
             currentSession.clear();
             LOG.debug("findById(): ", e);
+        }
+
+        return recipeDetail;
+    }
+
+    @Override
+    public RecipeDetail findByRecipeBaseIdAllLoaded(Long recipeBaseId)
+    {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        Query<RecipeDetail> query = currentSession.createQuery(
+                "from RecipeDetail where recipe_base_id=:recipeBaseId",
+                RecipeDetail.class);
+        query.setParameter("recipeBaseId", recipeBaseId);
+
+        RecipeDetail recipeDetail = null;
+        try
+        {
+            recipeDetail = query.getSingleResult();
+
+            if(recipeDetail != null && recipeDetail.getRecipeDetailDishTypes() != null)
+            {
+                // populate DishType list
+                List<Long> dishTypeIdList = new ArrayList<>(recipeDetail.getRecipeDetailDishTypes().size());
+                for(RecipeDetailDishTypes recipeDetailDishTypes: recipeDetail.getRecipeDetailDishTypes())
+                {
+                    if(recipeDetailDishTypes != null
+                            && recipeDetailDishTypes.getRecipeDetailDishTypesId() != null
+                            && recipeDetailDishTypes.getRecipeDetailDishTypesId().getDishTypeId() != null)
+                    {
+                        dishTypeIdList.add(recipeDetailDishTypes.getRecipeDetailDishTypesId().getDishTypeId());
+                    }
+                }
+                iDishTypeDao.findRecipeDetailDishes(dishTypeIdList);
+
+                // populate Cuisine list
+                List<Long> cuisineIdList = new ArrayList<>(recipeDetail.getRecipeDetailCuisines().size());
+                for(RecipeDetailCuisines recipeDetailCuisines: recipeDetail.getRecipeDetailCuisines())
+                {
+                    if(recipeDetailCuisines != null
+                            && recipeDetailCuisines.getRecipeDetailCuisinesId() != null
+                            && recipeDetailCuisines.getRecipeDetailCuisinesId().getCuisineId() != null)
+                    {
+                        cuisineIdList.add(recipeDetailCuisines.getRecipeDetailCuisinesId().getCuisineId());
+                    }
+                }
+                iCuisineDao.findRecipeDetailCuisines(cuisineIdList);
+
+                // populate Step list
+                List<Long> stepIdList = new ArrayList<>(recipeDetail.getRecipeDetailSteps().size());
+                for(RecipeDetailSteps recipeDetailSteps: recipeDetail.getRecipeDetailSteps())
+                {
+                    if(recipeDetailSteps != null
+                            && recipeDetailSteps.getRecipeDetailStepsId() != null
+                            && recipeDetailSteps.getRecipeDetailStepsId().getStepId() != null)
+                    {
+                        stepIdList.add(recipeDetailSteps.getRecipeDetailStepsId().getStepId());
+                    }
+                }
+                iStepDao.findRecipeDetailSteps(stepIdList);
+
+                // populate Ingredient list
+                List<Long> ingredientIdList = new ArrayList<>(recipeDetail.getRecipeDetailIngredients().size());
+                for(RecipeDetailIngredients recipeDetailIngredients: recipeDetail.getRecipeDetailIngredients())
+                {
+                    if(recipeDetailIngredients != null
+                            && recipeDetailIngredients.getRecipeDetailIngredientsId() != null
+                            && recipeDetailIngredients.getRecipeDetailIngredientsId().getIngredientId() != null)
+                    {
+                        ingredientIdList.add(recipeDetailIngredients.getRecipeDetailIngredientsId().getIngredientId());
+                    }
+                }
+                iIngredientDao.findRecipeDetailIngredients(ingredientIdList);
+            }
+        }
+        catch(Exception e)
+        {
+            currentSession.clear();
+            LOG.debug("findByRecipeBaseIdAllLoaded(): ", e);
         }
 
         return recipeDetail;

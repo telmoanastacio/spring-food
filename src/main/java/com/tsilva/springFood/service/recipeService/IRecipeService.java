@@ -1,8 +1,7 @@
 package com.tsilva.springFood.service.recipeService;
 
-import com.tsilva.springFood.entity.RecipeBase;
-
-import java.util.List;
+import com.tsilva.springFood.controller.apiServer.contract.recipeBaseSearchResponse.RecipeBaseSearchResponse;
+import org.springframework.web.context.request.async.DeferredResult;
 
 /**
  * Created by Telmo Silva on 18.05.2020.
@@ -10,5 +9,5 @@ import java.util.List;
 
 public interface IRecipeService
 {
-    public List<RecipeBase> findByRecipeName(String recipeName);
+    public void findByRecipeName(String recipeName, DeferredResult<RecipeBaseSearchResponse> deferredResult);
 }

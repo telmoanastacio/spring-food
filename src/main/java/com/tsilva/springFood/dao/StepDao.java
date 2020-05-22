@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.List;
+
 /**
  * Created by Telmo Silva on 18.05.2020.
  */
@@ -43,6 +46,54 @@ public class StepDao implements IStepDao
         }
 
         return step;
+    }
+
+    @Override
+    @Nullable
+    public Collection<Step> findRecipeDetailSteps(Collection<Long> stepIdCollection)
+    {
+        if(stepIdCollection == null || stepIdCollection.isEmpty())
+        {
+            return null;
+        }
+
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("");
+        sb.append("from Step where (");
+
+        boolean isFirst = true;
+        for(Long stepId: stepIdCollection)
+        {
+            if(isFirst)
+            {
+                sb.append("id=");
+            }
+            else
+            {
+                sb.append(" or id=");
+            }
+            sb.append(stepId);
+
+            isFirst = false;
+        }
+        sb.append(")");
+
+        Query<Step> query = currentSession.createQuery(sb.toString(), Step.class);
+
+        List<Step> stepList = null;
+        try
+        {
+            stepList = query.getResultList();
+        }
+        catch(Exception e)
+        {
+            currentSession.clear();
+            LOG.debug("findRecipeDetailSteps(): ", e);
+        }
+
+        return stepList;
     }
 
     @Override

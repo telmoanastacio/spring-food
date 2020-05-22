@@ -96,6 +96,11 @@ public class RecipeBase implements Serializable
 		return recipeDetail;
 	}
 
+	public Long getUpdateTimeStamp()
+	{
+		return updateTimeStamp;
+	}
+
 	public void setId(Long id)
 	{
 		this.id = id;
@@ -131,6 +136,11 @@ public class RecipeBase implements Serializable
 		this.recipeDetail = recipeDetail;
 	}
 
+	public void setUpdateTimeStamp(Long updateTimeStamp)
+	{
+		this.updateTimeStamp = updateTimeStamp;
+	}
+
 	@Override
 	public boolean equals(Object o)
 	{
@@ -148,13 +158,14 @@ public class RecipeBase implements Serializable
 				Objects.equals(title, that.title) &&
 				Objects.equals(readyInMinutes, that.readyInMinutes) &&
 				Objects.equals(servings, that.servings) &&
-				Objects.equals(image, that.image);
+				Objects.equals(image, that.image) &&
+				Objects.equals(updateTimeStamp, that.updateTimeStamp);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(id, spoonacularId, title, readyInMinutes, servings, image);
+		return Objects.hash(id, spoonacularId, title, readyInMinutes, servings, image, updateTimeStamp);
 	}
 
 	@Override
@@ -167,6 +178,7 @@ public class RecipeBase implements Serializable
 				", readyInMinutes=" + readyInMinutes +
 				", servings=" + servings +
 				", image='" + image + '\'' +
+				", updateTimeStamp=" + updateTimeStamp +
 				", recipeDetail=" + recipeDetail +
 				'}';
 	}
