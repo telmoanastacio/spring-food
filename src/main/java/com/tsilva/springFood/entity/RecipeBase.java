@@ -34,6 +34,9 @@ public class RecipeBase implements Serializable
 	@Column(name = "image")
 	private String image;
 
+	@Column(name = "update_time_stamp")
+	private Long updateTimeStamp;
+
 	@OneToOne(mappedBy = "recipeBase",
 			orphanRemoval = true,
 			cascade = CascadeType.ALL,
@@ -42,13 +45,20 @@ public class RecipeBase implements Serializable
 
 	public RecipeBase() {}
 
-	public RecipeBase(Long spoonacularId, String title, Long readyInMinutes, Long servings, String image)
+	public RecipeBase(
+			Long spoonacularId,
+			String title,
+			Long readyInMinutes,
+			Long servings,
+			String image,
+			Long updateTimeStamp)
 	{
 		this.spoonacularId = spoonacularId;
 		this.title = title;
 		this.readyInMinutes = readyInMinutes;
 		this.servings = servings;
 		this.image = image;
+		this.updateTimeStamp = updateTimeStamp;
 	}
 
 	public Long getId()

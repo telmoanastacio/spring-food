@@ -31,7 +31,7 @@ public class MvcController
 	@RequestMapping(value = "/", method = {RequestMethod.GET})
 	public String indexMapping()
 	{
-		iRecipeService.findByRecipeName("pizza");
+		iRecipeService.findByRecipeName("spaghetti");
 
 		return "index";
 	}

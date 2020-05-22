@@ -98,6 +98,7 @@ CREATE TABLE `recipe_search`
   `search_query` varchar(200) NOT NULL,
   `update_time_stamp` bigint NOT NULL,
   `successful_iteration` boolean NOT NULL,
+  `offset` bigint NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=UTF8MB4;
 
@@ -115,6 +116,7 @@ CREATE TABLE `recipe_base`
   `ready_in_minutes` bigint DEFAULT NULL,
   `servings` bigint DEFAULT NULL,
   `image` varchar(200) DEFAULT NULL,
+  `update_time_stamp` bigint NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=UTF8MB4;
 

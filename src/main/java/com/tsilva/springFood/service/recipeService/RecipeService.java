@@ -1,15 +1,16 @@
 package com.tsilva.springFood.service.recipeService;
 
+import com.tsilva.springFood.controller.apiClient.ApiConfig;
 import com.tsilva.springFood.controller.apiClient.ResponseCallback;
 import com.tsilva.springFood.controller.apiClient.contract.recipeInformation.AnalyzedInstruction;
 import com.tsilva.springFood.controller.apiClient.contract.recipeInformation.ExtendedIngredient;
 import com.tsilva.springFood.controller.apiClient.contract.recipeInformation.RecipeInformation;
-import com.tsilva.springFood.controller.apiClient.contract.recipeSearch.RecipeSearch;
 import com.tsilva.springFood.controller.apiClient.contract.recipeSearch.Result;
 import com.tsilva.springFood.controller.apiClient.request.get.GetBulkRecipeInformation;
 import com.tsilva.springFood.controller.apiClient.request.get.GetRecipeSearch;
 import com.tsilva.springFood.dao.*;
 import com.tsilva.springFood.entity.*;
+import com.tsilva.springFood.utils.TimeUtils;
 import org.apache.taglibs.standard.tag.common.core.NullAttributeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,13 +67,88 @@ public class RecipeService implements IRecipeService
     private ICuisineDao iCuisineDao;
 
     @Override
-    public RecipeBase findByRecipeName(String recipeName)
+    public List<RecipeBase> findByRecipeName(String recipeName)
     {
-        getRecipeSearch.execute(recipeName, new ResponseCallback<RecipeSearch>()
+        Date now = TimeUtils.now();
+
+        RecipeSearch recipeSearch = iRecipeSearchDao.findByRecipeSearchName(recipeName);
+        if(recipeSearch == null)
+        {
+            recipeSearch = new RecipeSearch(recipeName, now.getTime(), false);
+        }
+        else
+        {
+            if(recipeSearch.getSuccessfulIteration()
+                    && !isOldSearch(now, TimeUtils.dateFromTimeStamp(recipeSearch.getUpdateTimeStamp())))
+            {
+                LOG.debug("findByRecipeName() RecipeSearch not old enough to allow another search");
+                return null;
+            }
+        }
+        iRecipeSearchDao.save(recipeSearch);
+
+        List<RecipeBase> recipeBaseList = new LinkedList<>();
+        findByRecipeName(recipeName, new Long[]{0L}, new Long[]{0L}, recipeBaseList, recipeSearch);
+
+        return recipeBaseList;
+    }
+
+    private boolean isOldSearch(@NonNull Date now, @NonNull Date recipeSearchDate)
+    {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(recipeSearchDate);
+        calendar.add(Calendar.SECOND, ApiConfig.WAIT_AFTER_SUCCESSFUL_SEARCH_SECONDS);
+
+        return calendar.getTime().before(now);
+    }
+
+    /**
+     *
+     * @param offset {@code new Long[]{0L}} to initialize
+     * @param recipeAmount {@code new Long[]{0L}} to initialize
+     */
+    private void findByRecipeName(
+            String recipeName,
+            final Long[] offset,
+            final Long[] recipeAmount,
+            List<RecipeBase> recipeBaseList,
+            RecipeSearch rs)
+    {
+        getRecipeSearch.execute(
+                recipeName,
+                offset[0],
+                new ResponseCallback<com.tsilva.springFood.controller.apiClient.contract.recipeSearch.RecipeSearch>()
         {
             @Override
-            public void success(RecipeSearch recipeSearch)
+            public void success(
+                    com.tsilva.springFood.controller.apiClient.contract.recipeSearch.RecipeSearch recipeSearch)
             {
+                long totalResults = 0L;
+                if(recipeSearch.totalResults != null)
+                {
+                    totalResults = recipeSearch.totalResults;
+                }
+                else
+                {
+                    LOG.debug("findByRecipeName() couldn't find totalResults");
+                    return;
+                }
+
+                if(recipeAmount[0] == 0L)
+                {
+                    recipeAmount[0] = totalResults;
+                }
+
+                Long rsOffset = rs.getOffset();
+                if(!rs.getSuccessfulIteration() && offset[0] == 0L && rsOffset != null && rsOffset != 0L)
+                {
+                    offset[0] = rsOffset;
+
+                    findByRecipeName(recipeName, offset, recipeAmount, recipeBaseList, rs);
+                    LOG.debug("findByRecipeName() offset not 0. Starting from " + rsOffset);
+                    return;
+                }
+
                 List<Long> resultIdList = new ArrayList<>(recipeSearch.results.size());
                 Map<Long, Result> resultIdToResultMap = new HashMap<>();
                 for(Result result: recipeSearch.results)
@@ -88,6 +164,8 @@ public class RecipeService implements IRecipeService
                     {
                         for(RecipeInformation recipeInformation: recipeInformationList)
                         {
+                            offset[0]++;
+
                             // validate recipe information
                             IApiClientDataValidator iApiClientDataValidator = null;
                             try
@@ -148,12 +226,34 @@ public class RecipeService implements IRecipeService
 
                                 iIngredientDao.save(ingredient);
                             }
+
+                            recipeBaseList.add(recipeBase);
+                        }
+                        if(offset[0] < recipeAmount[0])
+                        {
+                            findByRecipeName(recipeName, offset, recipeAmount, recipeBaseList, rs);
+                        }
+                        else    // all successfully update
+                        {
+                            rs.setUpdateTimeStamp(TimeUtils.now().getTime());
+                            rs.setOffset(offset[0]);
+                            rs.setSuccessfulIteration(true);
+
+                            iRecipeSearchDao.save(rs);
+
+                            LOG.debug("All was update successfully");
                         }
                     }
 
                     @Override
                     public void failure(Throwable t)
                     {
+                        rs.setUpdateTimeStamp(TimeUtils.now().getTime());
+                        rs.setOffset(offset[0]);
+                        rs.setSuccessfulIteration(false);
+
+                        iRecipeSearchDao.save(rs);
+
                         LOG.debug("GetBulkRecipeInformation.execute().failure()", t);
                     }
                 });
@@ -162,21 +262,15 @@ public class RecipeService implements IRecipeService
             @Override
             public void failure(Throwable t)
             {
+                rs.setUpdateTimeStamp(TimeUtils.now().getTime());
+                rs.setOffset(offset[0]);
+                rs.setSuccessfulIteration(false);
+
+                iRecipeSearchDao.save(rs);
+
                 LOG.debug("GetRecipeSearch.execute().failure()", t);
             }
         });
-
-        return null;
-    }
-
-    private boolean isResultDataValid(Result result)
-    {
-        if(result == null || result.id == null || result.title == null)
-        {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -211,7 +305,7 @@ public class RecipeService implements IRecipeService
             image = result.image;
         }
 
-        RecipeBase recipeBase = new RecipeBase(id, title, readyInMinutes, servings, image);
+        RecipeBase recipeBase = new RecipeBase(id, title, readyInMinutes, servings, image, TimeUtils.now().getTime());
 
         iRecipeBaseDao.save(recipeBase);
 

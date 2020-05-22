@@ -10,11 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
+import javax.transaction.Transactional;
+
 /**
  * Created by Telmo Silva on 18.05.2020.
  */
 
 @Repository
+@Transactional
 public class RecipeSearchDao implements IRecipeSearchDao
 {
     private static final Logger LOG = LoggerFactory.getLogger(RecipeSearchDao.class);
