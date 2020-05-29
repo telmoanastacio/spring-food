@@ -1,5 +1,6 @@
 package com.tsilva.springFood.controller.apiServer;
 
+import com.tsilva.springFood.controller.apiServer.contract.RecipeDeleteResponse;
 import com.tsilva.springFood.controller.apiServer.contract.recipeBaseSearchResponse.RecipeBaseResponse;
 import com.tsilva.springFood.controller.apiServer.contract.recipeBaseSearchResponse.RecipeBaseSearchResponse;
 import com.tsilva.springFood.controller.apiServer.contract.recipeDetailSearchResponse.RecipeDetailResponse;
@@ -84,6 +85,36 @@ public class ApiControllerServer implements ApplicationListener<FindByRecipeName
         }
 
         return recipeDetailSearchResponse;
+    }
+
+    @RequestMapping(value = "/recipeDelete/{recipeBaseId}", method = RequestMethod.DELETE)
+    public RecipeDeleteResponse recipeDeleteMapping(@PathVariable(name = "recipeBaseId") Long recipeBaseId)
+    {
+        Date now = TimeUtils.now();
+
+        RecipeBase recipeBase = iRecipeBaseDao.findById(recipeBaseId);
+        RecipeDeleteResponse recipeDeleteResponse = null;
+        if(recipeBase == null)
+        {
+            // send error response, no data found
+            recipeDeleteResponse = new RecipeDeleteResponse(
+                    HttpStatus.NOT_FOUND.value(),
+                    "Recipe not found for recipeBaseId: " + recipeBaseId,
+                    now.getTime());
+
+            LOG.debug("Recipe not found for recipeBaseId: " + recipeBaseId);
+        }
+        else
+        {
+            iRecipeBaseDao.delete(recipeBase);
+
+            recipeDeleteResponse = new RecipeDeleteResponse(
+                    HttpStatus.OK.value(),
+                    "Deleted recipe with recipeBaseId: " + recipeBaseId,
+                    now.getTime());
+        }
+
+        return recipeDeleteResponse;
     }
 
     @Override
