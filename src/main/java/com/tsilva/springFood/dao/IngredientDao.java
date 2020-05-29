@@ -1,6 +1,7 @@
 package com.tsilva.springFood.dao;
 
 import com.tsilva.springFood.entity.Ingredient;
+import com.tsilva.springFood.entity.RecipeBase;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -105,6 +106,38 @@ public class IngredientDao implements IIngredientDao
         }
 
         return ingredientList;
+    }
+
+    @Nullable
+    public List<RecipeBase> findRecipeBaseListByIngredientNameLike(String ingredientName)
+    {
+        Session currentSession = sessionFactory.getCurrentSession();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("");
+        sb.append("SELECT recipe_base.*");
+        sb.append(" FROM ingredient");
+        sb.append(" INNER JOIN recipe_detail_ingredients ON ingredient.id=recipe_detail_ingredients.ingredient_id");
+        sb.append(" INNER JOIN recipe_detail ON recipe_detail_ingredients.recipe_detail_id=recipe_detail.id");
+        sb.append(" INNER JOIN recipe_base ON recipe_detail.recipe_base_id=recipe_base.id");
+        sb.append(" WHERE ingredient.name LIKE '%");
+        sb.append(ingredientName);
+        sb.append("%'");
+
+        Query<RecipeBase> query = currentSession.createNativeQuery(sb.toString(), RecipeBase.class);
+
+        List<RecipeBase> recipeBaseList = null;
+        try
+        {
+            recipeBaseList = query.getResultList();
+        }
+        catch(Exception e)
+        {
+            currentSession.clear();
+            LOG.debug("findRecipeBaseCollectionByIngredientName(): ", e);
+        }
+
+        return recipeBaseList;
     }
 
     @Override

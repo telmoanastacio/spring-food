@@ -1,6 +1,7 @@
 package com.tsilva.springFood.service.recipeService;
 
 import com.tsilva.springFood.controller.apiServer.contract.recipeBaseSearchResponse.RecipeBaseSearchResponse;
+import com.tsilva.springFood.controller.apiServer.enums.recipeBaseSearch.SearchType;
 import org.springframework.web.context.request.async.DeferredResult;
 
 /**
@@ -9,5 +10,8 @@ import org.springframework.web.context.request.async.DeferredResult;
 
 public interface IRecipeService
 {
-    public void findByRecipeName(String recipeName, DeferredResult<RecipeBaseSearchResponse> deferredResult);
+    public void findByRecipeName(
+            String recipeName,
+            SearchType searchType,
+            DeferredResult<RecipeBaseSearchResponse> deferredResult);
 }

@@ -1,6 +1,7 @@
 package com.tsilva.springFood.events.findByRecipeNameCompletion;
 
 import com.tsilva.springFood.controller.apiServer.contract.recipeBaseSearchResponse.RecipeBaseSearchResponse;
+import com.tsilva.springFood.controller.apiServer.enums.recipeBaseSearch.SearchType;
 import org.springframework.context.ApplicationEvent;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -14,6 +15,7 @@ public class FindByRecipeNameCompletionEvent extends ApplicationEvent
     private Boolean successfulIteration = null;
     private Long offset = null;
     private Long amount = null;
+    private SearchType searchType = SearchType.TITLE;
     private DeferredResult<RecipeBaseSearchResponse> deferredResult = null;
 
     public FindByRecipeNameCompletionEvent(
@@ -22,6 +24,7 @@ public class FindByRecipeNameCompletionEvent extends ApplicationEvent
             boolean successfulIteration,
             long offset,
             long amount,
+            SearchType searchType,
             DeferredResult<RecipeBaseSearchResponse> deferredResult)
     {
         super(source);
@@ -30,6 +33,7 @@ public class FindByRecipeNameCompletionEvent extends ApplicationEvent
         this.successfulIteration = successfulIteration;
         this.offset = offset;
         this.amount = amount;
+        this.searchType = searchType;
         this.deferredResult = deferredResult;
     }
 
@@ -58,6 +62,11 @@ public class FindByRecipeNameCompletionEvent extends ApplicationEvent
         return deferredResult;
     }
 
+    public SearchType getSearchType()
+    {
+        return searchType;
+    }
+
     @Override
     public String toString()
     {
@@ -66,6 +75,7 @@ public class FindByRecipeNameCompletionEvent extends ApplicationEvent
                 ", successfulIteration=" + successfulIteration +
                 ", offset=" + offset +
                 ", amount=" + amount +
+                ", searchType=" + searchType +
                 '}';
     }
 }

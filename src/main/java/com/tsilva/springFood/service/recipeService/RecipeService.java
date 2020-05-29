@@ -9,6 +9,7 @@ import com.tsilva.springFood.controller.apiClient.contract.recipeSearch.Result;
 import com.tsilva.springFood.controller.apiClient.request.get.GetBulkRecipeInformation;
 import com.tsilva.springFood.controller.apiClient.request.get.GetRecipeSearch;
 import com.tsilva.springFood.controller.apiServer.contract.recipeBaseSearchResponse.RecipeBaseSearchResponse;
+import com.tsilva.springFood.controller.apiServer.enums.recipeBaseSearch.SearchType;
 import com.tsilva.springFood.dao.*;
 import com.tsilva.springFood.entity.*;
 import com.tsilva.springFood.events.findByRecipeNameCompletion.FindByRecipeNameCompletionEvent;
@@ -74,7 +75,10 @@ public class RecipeService implements IRecipeService
     private FindByRecipeNameCompletionEventPublisher findByRecipeNameCompletionEventPublisher;
 
     @Override
-    public void findByRecipeName(String recipeName, DeferredResult<RecipeBaseSearchResponse> deferredResult)
+    public void findByRecipeName(
+            String recipeName,
+            SearchType searchType,
+            DeferredResult<RecipeBaseSearchResponse> deferredResult)
     {
         Date now = TimeUtils.now();
 
@@ -95,6 +99,7 @@ public class RecipeService implements IRecipeService
                                 true,
                                 0L,
                                 0L,
+                                searchType,
                                 deferredResult);
                 findByRecipeNameCompletionEventPublisher.publishEvent(findByRecipeNameCompletionEvent);
 
@@ -105,7 +110,8 @@ public class RecipeService implements IRecipeService
         iRecipeSearchDao.save(recipeSearch);
 
         List<RecipeBase> recipeBaseList = new LinkedList<>();
-        findByRecipeName(recipeName, new Long[]{0L}, new Long[]{0L}, recipeBaseList, recipeSearch, deferredResult);
+        findByRecipeName(
+                recipeName, new Long[]{0L}, new Long[]{0L}, recipeBaseList, recipeSearch, searchType, deferredResult);
     }
 
     private boolean isOldSearch(@NonNull Date now, @NonNull Date recipeSearchDate)
@@ -128,6 +134,7 @@ public class RecipeService implements IRecipeService
             final Long[] recipeAmount,
             List<RecipeBase> recipeBaseList,
             RecipeSearch rs,
+            SearchType searchType,
             DeferredResult<RecipeBaseSearchResponse> deferredResult)
     {
         getRecipeSearch.execute(
@@ -153,6 +160,7 @@ public class RecipeService implements IRecipeService
                                     false,
                                     offset[0],
                                     recipeAmount[0],
+                                    searchType,
                                     deferredResult);
                     findByRecipeNameCompletionEventPublisher.publishEvent(findByRecipeNameCompletionEvent);
 
@@ -170,7 +178,7 @@ public class RecipeService implements IRecipeService
                 {
                     offset[0] = rsOffset;
 
-                    findByRecipeName(recipeName, offset, recipeAmount, recipeBaseList, rs, deferredResult);
+                    findByRecipeName(recipeName, offset, recipeAmount, recipeBaseList, rs, searchType, deferredResult);
                     LOG.debug("findByRecipeName() offset not 0. Starting from " + rsOffset);
                     return;
                 }
@@ -184,6 +192,7 @@ public class RecipeService implements IRecipeService
                                     false,
                                     offset[0],
                                     recipeAmount[0],
+                                    searchType,
                                     deferredResult);
                     findByRecipeNameCompletionEventPublisher.publishEvent(findByRecipeNameCompletionEvent);
 
@@ -273,7 +282,8 @@ public class RecipeService implements IRecipeService
                         }
                         if(offset[0] < recipeAmount[0])
                         {
-                            findByRecipeName(recipeName, offset, recipeAmount, recipeBaseList, rs, deferredResult);
+                            findByRecipeName(
+                                    recipeName, offset, recipeAmount, recipeBaseList, rs, searchType, deferredResult);
                         }
                         else    // all successfully update
                         {
@@ -292,6 +302,7 @@ public class RecipeService implements IRecipeService
                                             true,
                                             offset[0],
                                             recipeAmount[0],
+                                            searchType,
                                             deferredResult);
                             findByRecipeNameCompletionEventPublisher.publishEvent(findByRecipeNameCompletionEvent);
                         }
@@ -315,6 +326,7 @@ public class RecipeService implements IRecipeService
                                         false,
                                         offset[0],
                                         recipeAmount[0],
+                                        searchType,
                                         deferredResult);
                         findByRecipeNameCompletionEventPublisher.publishEvent(findByRecipeNameCompletionEvent);
                     }
@@ -342,6 +354,7 @@ public class RecipeService implements IRecipeService
                                 false,
                                 offset[0],
                                 recipeAmount[0],
+                                searchType,
                                 deferredResult);
                 findByRecipeNameCompletionEventPublisher.publishEvent(findByRecipeNameCompletionEvent);
             }

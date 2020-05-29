@@ -5,6 +5,8 @@ import com.tsilva.springFood.controller.apiServer.contract.recipeBaseSearchRespo
 import com.tsilva.springFood.controller.apiServer.contract.recipeBaseSearchResponse.RecipeBaseSearchResponse;
 import com.tsilva.springFood.controller.apiServer.contract.recipeDetailSearchResponse.RecipeDetailResponse;
 import com.tsilva.springFood.controller.apiServer.contract.recipeDetailSearchResponse.RecipeDetailSearchResponse;
+import com.tsilva.springFood.controller.apiServer.enums.recipeBaseSearch.SearchType;
+import com.tsilva.springFood.dao.IIngredientDao;
 import com.tsilva.springFood.dao.IRecipeBaseDao;
 import com.tsilva.springFood.dao.IRecipeDetailDao;
 import com.tsilva.springFood.entity.RecipeBase;
@@ -17,10 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import java.util.ArrayList;
@@ -46,12 +45,23 @@ public class ApiControllerServer implements ApplicationListener<FindByRecipeName
     @Autowired
     private IRecipeDetailDao iRecipeDetailDao;
 
+    @Autowired
+    private IIngredientDao iIngredientDao;
+
     @RequestMapping(value = "/recipes/{recipeName}", method = RequestMethod.GET)
-    public DeferredResult<RecipeBaseSearchResponse> recipeMapping(@PathVariable(name = "recipeName") String recipeName)
+    public DeferredResult<RecipeBaseSearchResponse> recipeMapping(
+            @PathVariable(name = "recipeName") String recipeName,
+            @RequestParam(name = "searchType", required = false) Integer searchTypeInt)
     {
         DeferredResult<RecipeBaseSearchResponse> deferredResult = new DeferredResult<>(300000L);
 
-        iRecipeService.findByRecipeName(recipeName, deferredResult);
+        SearchType searchType = SearchType.TITLE;
+        if(searchTypeInt != null && searchTypeInt == 1)
+        {
+            searchType = SearchType.INGREDIENT;
+        }
+
+        iRecipeService.findByRecipeName(recipeName, searchType, deferredResult);
 
         return deferredResult;
     }
@@ -123,9 +133,18 @@ public class ApiControllerServer implements ApplicationListener<FindByRecipeName
         Date now = TimeUtils.now();
 
         String recipeName = event.getName();
+        SearchType searchType = event.getSearchType();
         DeferredResult<RecipeBaseSearchResponse> deferredResult = event.getDeferredResult();
 
-        List<RecipeBase> recipeBaseList = iRecipeBaseDao.findRecipesByNameLike(recipeName);
+        List<RecipeBase> recipeBaseList = null;
+        if(searchType == SearchType.INGREDIENT)
+        {
+            recipeBaseList = iIngredientDao.findRecipeBaseListByIngredientNameLike(recipeName);
+        }
+        else
+        {
+            recipeBaseList = iRecipeBaseDao.findRecipesByNameLike(recipeName);
+        }
         RecipeBaseSearchResponse recipeBaseSearchResponse = null;
         if(recipeBaseList == null || recipeBaseList.isEmpty())
         {
