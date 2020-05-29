@@ -19,18 +19,18 @@ public class RecipeDetailDishTypes implements Serializable
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("recipeDetailId")
-    private RecipeDetail recipeDetail;
+    private RecipeDetail recipe_detail;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("dishTypeId")
-    private DishType dishType;
+    private DishType dish_type;
 
     private RecipeDetailDishTypes() {}
 
     public RecipeDetailDishTypes(RecipeDetail recipeDetail, DishType dishType)
     {
-        this.recipeDetail = recipeDetail;
-        this.dishType = dishType;
+        this.recipe_detail = recipeDetail;
+        this.dish_type = dishType;
         this.recipeDetailDishTypesId = new RecipeDetailDishTypesId(recipeDetail.getId(), dishType.getId());
     }
 
@@ -41,12 +41,12 @@ public class RecipeDetailDishTypes implements Serializable
 
     public RecipeDetail getRecipeDetail()
     {
-        return recipeDetail;
+        return recipe_detail;
     }
 
     public DishType getDishType()
     {
-        return dishType;
+        return dish_type;
     }
 
     public void setRecipeDetailDishTypesId(RecipeDetailDishTypesId recipeDetailDishTypesId)
@@ -56,12 +56,12 @@ public class RecipeDetailDishTypes implements Serializable
 
     public void setRecipeDetail(RecipeDetail recipeDetail)
     {
-        this.recipeDetail = recipeDetail;
+        this.recipe_detail = recipeDetail;
     }
 
     public void setDishType(DishType dishType)
     {
-        this.dishType = dishType;
+        this.dish_type = dishType;
     }
 
     @Override
@@ -76,14 +76,14 @@ public class RecipeDetailDishTypes implements Serializable
             return false;
         }
         RecipeDetailDishTypes that = (RecipeDetailDishTypes) o;
-        return Objects.equals(recipeDetail, that.recipeDetail) &&
-                Objects.equals(dishType, that.dishType);
+        return Objects.equals(recipe_detail, that.recipe_detail) &&
+                Objects.equals(dish_type, that.dish_type);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(recipeDetail, dishType);
+        return Objects.hash(recipe_detail, dish_type);
     }
 
     @Override
@@ -91,8 +91,8 @@ public class RecipeDetailDishTypes implements Serializable
     {
         return "RecipeDetailDishTypes{" +
                 "recipeDetailDishTypesId=" + recipeDetailDishTypesId +
-                ", recipeDetail=" + recipeDetail +
-                ", dishType=" + dishType +
+                ", recipeDetail=" + recipe_detail +
+                ", dishType=" + dish_type +
                 '}';
     }
 }

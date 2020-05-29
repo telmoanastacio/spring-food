@@ -12,4 +12,5 @@ public class Step
     public String step;
     public List<Ingredient> ingredients;
     public List<Equipment> equipment;
+    public Length length;
 }

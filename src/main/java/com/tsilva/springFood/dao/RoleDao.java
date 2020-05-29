@@ -4,7 +4,10 @@ import com.tsilva.springFood.entity.Role;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -14,11 +17,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class RoleDao implements IRoleDao
 {
+	private static final Logger LOG = LoggerFactory.getLogger(RoleDao.class);
+
 	// need to inject the session factory
 	@Autowired
 	private SessionFactory sessionFactory;
 
 	@Override
+	@Nullable
 	public Role findRoleById(Long roleId)
 	{
 		// get the current hibernate session
@@ -35,13 +41,15 @@ public class RoleDao implements IRoleDao
 		}
 		catch(Exception e)
 		{
-			role = null;
+			currentSession.clear();
+			LOG.debug("findRoleById(): ", e);
 		}
 
 		return role;
 	}
 
 	@Override
+	@Nullable
 	public Role findRoleByName(String roleName)
 	{
 		// get the current hibernate session
@@ -58,7 +66,8 @@ public class RoleDao implements IRoleDao
 		}
 		catch(Exception e)
 		{
-			role = null;
+			currentSession.clear();
+			LOG.debug("findRoleByName(): ", e);
 		}
 		
 		return role;

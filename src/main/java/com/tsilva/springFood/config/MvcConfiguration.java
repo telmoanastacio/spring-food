@@ -102,7 +102,7 @@ public class MvcConfiguration implements WebMvcConfigurer
 
 		// set the properties
 		sessionFactory.setDataSource(getSecurityDataSource());
-		sessionFactory.setPackagesToScan(env.getProperty("hiberante.packagesToScan"));
+		sessionFactory.setPackagesToScan(env.getProperty("hibernate.packagesToScan"));
 		sessionFactory.setHibernateProperties(getHibernateProperties());
 
 		return sessionFactory;
@@ -138,6 +138,8 @@ public class MvcConfiguration implements WebMvcConfigurer
 
 		props.setProperty("hibernate.dialect", env.getProperty("hibernate.dialect"));
 		props.setProperty("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
+		props.setProperty("hibernate.format_sql", env.getProperty("hibernate.format_sql"));
+		props.setProperty("hibernate.use_sql_comments", env.getProperty("hibernate.use_sql_comments"));
 
 		return props;
 	}

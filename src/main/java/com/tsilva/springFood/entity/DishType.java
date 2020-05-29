@@ -24,7 +24,7 @@ public class DishType implements Serializable
 	@Column(name = "name")
 	private String name;
 
-	@OneToMany(mappedBy = "dishType",
+	@OneToMany(mappedBy = "dish_type",
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private Collection<RecipeDetailDishTypes> recipeDetailDishTypes = new ArrayList<>();

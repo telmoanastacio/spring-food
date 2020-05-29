@@ -23,7 +23,7 @@ public class IngredientMetas implements Serializable
 	private String meta;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@MapsId("ingredient_id")
+	@JoinColumn(name = "ingredient_id")
 	private Ingredient ingredient;
 
 	public IngredientMetas() {}
@@ -36,6 +36,36 @@ public class IngredientMetas implements Serializable
 	public IngredientMetas(String meta, Ingredient ingredient)
 	{
 		this.meta = meta;
+		this.ingredient = ingredient;
+	}
+
+	public Long getId()
+	{
+		return id;
+	}
+
+	public String getMeta()
+	{
+		return meta;
+	}
+
+	public Ingredient getIngredient()
+	{
+		return ingredient;
+	}
+
+	public void setId(Long id)
+	{
+		this.id = id;
+	}
+
+	public void setMeta(String meta)
+	{
+		this.meta = meta;
+	}
+
+	public void setIngredient(Ingredient ingredient)
+	{
 		this.ingredient = ingredient;
 	}
 

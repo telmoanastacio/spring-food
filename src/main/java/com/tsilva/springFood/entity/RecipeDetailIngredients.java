@@ -19,7 +19,7 @@ public class RecipeDetailIngredients implements Serializable
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("recipeDetailId")
-    private RecipeDetail recipeDetail;
+    private RecipeDetail recipe_detail;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("ingredientId")
@@ -29,7 +29,7 @@ public class RecipeDetailIngredients implements Serializable
 
     public RecipeDetailIngredients(RecipeDetail recipeDetail, Ingredient ingredient)
     {
-        this.recipeDetail = recipeDetail;
+        this.recipe_detail = recipeDetail;
         this.ingredient = ingredient;
         this.recipeDetailIngredientsId = new RecipeDetailIngredientsId(recipeDetail.getId(), ingredient.getId());
     }
@@ -41,7 +41,7 @@ public class RecipeDetailIngredients implements Serializable
 
     public RecipeDetail getRecipeDetail()
     {
-        return recipeDetail;
+        return recipe_detail;
     }
 
     public Ingredient getIngredient()
@@ -56,7 +56,7 @@ public class RecipeDetailIngredients implements Serializable
 
     public void setRecipeDetail(RecipeDetail recipeDetail)
     {
-        this.recipeDetail = recipeDetail;
+        this.recipe_detail = recipeDetail;
     }
 
     public void setIngredient(Ingredient ingredient)
@@ -76,14 +76,14 @@ public class RecipeDetailIngredients implements Serializable
             return false;
         }
         RecipeDetailIngredients that = (RecipeDetailIngredients) o;
-        return Objects.equals(recipeDetail, that.recipeDetail) &&
+        return Objects.equals(recipe_detail, that.recipe_detail) &&
                 Objects.equals(ingredient, that.ingredient);
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(recipeDetail, ingredient);
+        return Objects.hash(recipe_detail, ingredient);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class RecipeDetailIngredients implements Serializable
     {
         return "RecipeDetailIngredients{" +
                 "recipeDetailIngredientsId=" + recipeDetailIngredientsId +
-                ", recipeDetail=" + recipeDetail +
+                ", recipeDetail=" + recipe_detail +
                 ", ingredient=" + ingredient +
                 '}';
     }

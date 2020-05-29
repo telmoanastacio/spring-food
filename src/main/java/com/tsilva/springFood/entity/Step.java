@@ -38,16 +38,10 @@ public class Step implements Serializable
 			orphanRemoval = true)
 	private Collection<RecipeDetailSteps> recipeDetailSteps = new ArrayList<>();
 
-	@OneToMany(mappedBy = "step",
-			cascade = CascadeType.ALL,
-			orphanRemoval = true)
-	private Collection<IngredientsSteps> ingredientsSteps = new ArrayList<>();
-
 	public Step() {}
 
-	public Step(Long id, Long number, String step, Long lengthNumber, String lengthUnit)
+	public Step(Long number, String step, Long lengthNumber, String lengthUnit)
 	{
-		this.id = id;
 		this.number = number;
 		this.step = step;
 		this.lengthNumber = lengthNumber;
@@ -84,11 +78,6 @@ public class Step implements Serializable
 		return recipeDetailSteps;
 	}
 
-	public Collection<IngredientsSteps> getIngredientsSteps()
-	{
-		return ingredientsSteps;
-	}
-
 	public void setId(Long id)
 	{
 		this.id = id;
@@ -117,11 +106,6 @@ public class Step implements Serializable
 	public void setRecipeDetailSteps(Collection<RecipeDetailSteps> recipeDetailSteps)
 	{
 		this.recipeDetailSteps = recipeDetailSteps;
-	}
-
-	public void setIngredientsSteps(Collection<IngredientsSteps> ingredientsSteps)
-	{
-		this.ingredientsSteps = ingredientsSteps;
 	}
 
 	@Override
@@ -159,7 +143,6 @@ public class Step implements Serializable
 				", lengthNumber=" + lengthNumber +
 				", lengthUnit='" + lengthUnit + '\'' +
 				", recipeDetailSteps=" + recipeDetailSteps +
-				", ingredientsSteps=" + ingredientsSteps +
 				'}';
 	}
 }

@@ -27,7 +27,7 @@ public class GetRecipeInformation
     public void execute(Long recipeId, ResponseCallback<RecipeInformation> responseCallback)
     {
         spoonacularApiClient
-                .getRecipeInformation(ApiConfig.SPOONACULAR_API_KEY, recipeId)
+                .getRecipeInformation(recipeId, ApiConfig.SPOONACULAR_API_KEY)
                 .enqueue(new Callback<RecipeInformation>()
                 {
                     @Override

@@ -28,6 +28,9 @@ public class RecipeSearch implements Serializable
 	@Column(name = "successful_iteration")
 	private Boolean successfulIteration;
 
+	@Column(name = "offset")
+	private Long offset;
+
 	public RecipeSearch() {}
 
 	public RecipeSearch(String searchQuery, Long updateTimeStamp, Boolean successfulIteration)
@@ -35,6 +38,7 @@ public class RecipeSearch implements Serializable
 		this.searchQuery = searchQuery;
 		this.updateTimeStamp = updateTimeStamp;
 		this.successfulIteration = successfulIteration;
+		this.offset = 0L;
 	}
 
 	public Long getId()
@@ -57,6 +61,11 @@ public class RecipeSearch implements Serializable
 		return successfulIteration;
 	}
 
+	public Long getOffset()
+	{
+		return offset;
+	}
+
 	public void setId(Long id)
 	{
 		this.id = id;
@@ -77,6 +86,11 @@ public class RecipeSearch implements Serializable
 		this.successfulIteration = successfulIteration;
 	}
 
+	public void setOffset(Long offset)
+	{
+		this.offset = offset;
+	}
+
 	@Override
 	public boolean equals(Object o)
 	{
@@ -92,13 +106,14 @@ public class RecipeSearch implements Serializable
 		return Objects.equals(id, that.id) &&
 				Objects.equals(searchQuery, that.searchQuery) &&
 				Objects.equals(updateTimeStamp, that.updateTimeStamp) &&
-				Objects.equals(successfulIteration, that.successfulIteration);
+				Objects.equals(successfulIteration, that.successfulIteration) &&
+				Objects.equals(offset, that.offset);
 	}
 
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(id, searchQuery, updateTimeStamp, successfulIteration);
+		return Objects.hash(id, searchQuery, updateTimeStamp, successfulIteration, offset);
 	}
 
 	@Override
@@ -109,6 +124,7 @@ public class RecipeSearch implements Serializable
 				", searchQuery='" + searchQuery + '\'' +
 				", updateTimeStamp=" + updateTimeStamp +
 				", successfulIteration=" + successfulIteration +
+				", offset=" + offset +
 				'}';
 	}
 }

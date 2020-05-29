@@ -112,22 +112,22 @@ public class RecipeDetail implements Serializable
 	@JoinColumn(name="recipe_base_id")
 	private RecipeBase recipeBase;
 
-	@OneToMany(mappedBy = "recipeDetail",
+	@OneToMany(mappedBy = "recipe_detail",
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private Collection<RecipeDetailDishTypes> recipeDetailDishTypes = new ArrayList<>();
 
-	@OneToMany(mappedBy = "recipeDetail",
+	@OneToMany(mappedBy = "recipe_detail",
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private Collection<RecipeDetailCuisines> recipeDetailCuisines = new ArrayList<>();
 
-	@OneToMany(mappedBy = "recipeDetail",
+	@OneToMany(mappedBy = "recipe_detail",
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private Collection<RecipeDetailIngredients> recipeDetailIngredients = new ArrayList<>();
 
-	@OneToMany(mappedBy = "recipeDetail",
+	@OneToMany(mappedBy = "recipe_detail",
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private Collection<RecipeDetailSteps> recipeDetailSteps = new ArrayList<>();
@@ -162,7 +162,8 @@ public class RecipeDetail implements Serializable
 			String imageType,
 			String summary,
 			String instructions,
-			Long originalId)
+			Long originalId,
+			RecipeBase recipeBase)
 	{
 		this.vegetarian = vegetarian;
 		this.vegan = vegan;
@@ -193,6 +194,11 @@ public class RecipeDetail implements Serializable
 		this.summary = summary;
 		this.instructions = instructions;
 		this.originalId = originalId;
+		this.recipeBase = recipeBase;
+		this.recipeDetailDishTypes = recipeDetailDishTypes;
+		this.recipeDetailCuisines = recipeDetailCuisines;
+		this.recipeDetailIngredients = recipeDetailIngredients;
+		this.recipeDetailSteps = recipeDetailSteps;
 	}
 
 	public Long getId()
