@@ -1,10 +1,12 @@
 package com.tsilva.springFood.controller.apiServer;
 
 import com.tsilva.springFood.controller.apiServer.contract.RecipeDeleteResponse;
+import com.tsilva.springFood.controller.apiServer.contract.RecipeSaveResponse;
 import com.tsilva.springFood.controller.apiServer.contract.recipeBaseSearchResponse.RecipeBaseResponse;
 import com.tsilva.springFood.controller.apiServer.contract.recipeBaseSearchResponse.RecipeBaseSearchResponse;
 import com.tsilva.springFood.controller.apiServer.contract.recipeDetailSearchResponse.RecipeDetailResponse;
 import com.tsilva.springFood.controller.apiServer.contract.recipeDetailSearchResponse.RecipeDetailSearchResponse;
+import com.tsilva.springFood.controller.apiServer.contract.recipeSaveRequest.RecipeSaveRequest;
 import com.tsilva.springFood.controller.apiServer.enums.recipeBaseSearch.SearchType;
 import com.tsilva.springFood.dao.IIngredientDao;
 import com.tsilva.springFood.dao.IRecipeBaseDao;
@@ -125,6 +127,36 @@ public class ApiControllerServer implements ApplicationListener<FindByRecipeName
         }
 
         return recipeDeleteResponse;
+    }
+
+    @RequestMapping(value = "/recipeSave", method = RequestMethod.POST)
+    public RecipeSaveResponse recipeSaveMapping(@RequestBody(required = false) RecipeSaveRequest recipeSaveRequest)
+    {
+        Date now = TimeUtils.now();
+
+        RecipeSaveResponse recipeSaveResponse = null;
+        if(iRecipeService.saveRecipe(recipeSaveRequest))
+        {
+            // send OK status
+            recipeSaveResponse = new RecipeSaveResponse(
+                    HttpStatus.OK.value(),
+                    "Recipe successfully saved.",
+                    now.getTime());
+
+            LOG.debug("Recipe successfully saved.");
+        }
+        else
+        {
+            // send error status
+            recipeSaveResponse = new RecipeSaveResponse(
+                    HttpStatus.BAD_REQUEST.value(),
+                    "Recipe save failed.",
+                    now.getTime());
+
+            LOG.debug("Recipe save failed.");
+        }
+
+        return recipeSaveResponse;
     }
 
     @Override

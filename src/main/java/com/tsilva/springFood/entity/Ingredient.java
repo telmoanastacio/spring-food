@@ -21,6 +21,9 @@ public class Ingredient implements Serializable
 	@Transient
 	private ExtendedIngredient extendedIngredient = null;
 
+	@Transient
+	private com.tsilva.springFood.controller.apiServer.contract.recipeSaveRequest.Ingredient saveIngredient = null;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id")
@@ -78,6 +81,31 @@ public class Ingredient implements Serializable
 	private Collection<IngredientMetas> ingredientMetas = new ArrayList<>();
 
 	public Ingredient() {}
+
+	public Ingredient(Long spoonacularId,
+			String aisle,
+			String image,
+			String consistency,
+			String name,
+			String original,
+			String originalString,
+			String originalName,
+			Double amount,
+			String unit,
+			com.tsilva.springFood.controller.apiServer.contract.recipeSaveRequest.Ingredient ingredient)
+	{
+		this.spoonacularId = spoonacularId;
+		this.aisle = aisle;
+		this.image = image;
+		this.consistency = consistency;
+		this.name = name;
+		this.original = original;
+		this.originalString = originalString;
+		this.originalName = originalName;
+		this.amount = amount;
+		this.unit = unit;
+		this.saveIngredient = ingredient;
+	}
 
 	public Ingredient(Long spoonacularId,
 		  	String aisle,
@@ -182,6 +210,11 @@ public class Ingredient implements Serializable
 	public ExtendedIngredient getExtendedIngredient()
 	{
 		return extendedIngredient;
+	}
+
+	public com.tsilva.springFood.controller.apiServer.contract.recipeSaveRequest.Ingredient getSaveIngredient()
+	{
+		return saveIngredient;
 	}
 
 	public void setId(Long id)

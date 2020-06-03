@@ -67,7 +67,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
 				.accessDeniedPage("/access-denied")
 			.and()
 			.csrf()
-				.ignoringAntMatchers("/spring-food-api/recipeDelete/**");
+				.ignoringAntMatchers("/spring-food-api/recipeDelete/**")
+				.ignoringAntMatchers("/spring-food-api/recipeSave");
 	}
 
 	public DaoAuthenticationProvider authenticationProvider()

@@ -111,7 +111,7 @@ DROP TABLE IF EXISTS `recipe_base`;
 CREATE TABLE `recipe_base`
 (
   `id` bigint NOT NULL AUTO_INCREMENT,
-  `spoonacular_id` bigint UNIQUE NOT NULL,
+  `spoonacular_id` bigint UNIQUE DEFAULT NULL,
   `title` varchar(200) NOT NULL,
   `ready_in_minutes` bigint DEFAULT NULL,
   `servings` bigint DEFAULT NULL,

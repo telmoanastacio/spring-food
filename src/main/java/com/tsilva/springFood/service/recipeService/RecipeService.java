@@ -9,6 +9,7 @@ import com.tsilva.springFood.controller.apiClient.contract.recipeSearch.Result;
 import com.tsilva.springFood.controller.apiClient.request.get.GetBulkRecipeInformation;
 import com.tsilva.springFood.controller.apiClient.request.get.GetRecipeSearch;
 import com.tsilva.springFood.controller.apiServer.contract.recipeBaseSearchResponse.RecipeBaseSearchResponse;
+import com.tsilva.springFood.controller.apiServer.contract.recipeSaveRequest.RecipeSaveRequest;
 import com.tsilva.springFood.controller.apiServer.enums.recipeBaseSearch.SearchType;
 import com.tsilva.springFood.dao.*;
 import com.tsilva.springFood.entity.*;
@@ -370,6 +371,11 @@ public class RecipeService implements IRecipeService
     {
         // recipe already exists
         if(iRecipeBaseDao.findBySpoonacularId(result.id) != null)
+        {
+            LOG.debug("saveRecipeBase() recipe already exists");
+            return null;
+        }
+        else if(iRecipeBaseDao.findByRecipeBaseName(result.title) != null)
         {
             LOG.debug("saveRecipeBase() recipe already exists");
             return null;
@@ -765,6 +771,340 @@ public class RecipeService implements IRecipeService
         if(extendedIngredient.measures.us != null && extendedIngredient.measures.us.unitLong != null)
         {
             usUnitLong = extendedIngredient.measures.us.unitLong;
+        }
+
+        Measure measure = new Measure(unitShort, unitLong, usUnitShort, usUnitLong, ingredient);
+
+        ingredient.setMeasure(measure);
+
+        return measure;
+    }
+
+    @Override
+    public boolean saveRecipe(RecipeSaveRequest recipeSaveRequest)
+    {
+        Date now = TimeUtils.now();
+
+        try
+        {
+            IRecipeSaveRequestValidator iRecipeSaveRequestValidator = new RecipeSaveRequestValidator(recipeSaveRequest);
+
+            if(iRecipeSaveRequestValidator.validateRecipeSaveRequest())
+            {
+                RecipeBase recipeBase = iRecipeBaseDao.findByRecipeBaseName(
+                        recipeSaveRequest.getRecipeBase().getTitle());
+
+                if(recipeBase == null)
+                {
+                    RecipeSaveRequest validateRecipeSaveRequest = iRecipeSaveRequestValidator.getRecipeSaveRequest();
+                    recipeBase = new RecipeBase(
+                            null,
+                            validateRecipeSaveRequest.getRecipeBase().getTitle(),
+                            validateRecipeSaveRequest.getRecipeBase().getReadyInMinutes(),
+                            validateRecipeSaveRequest.getRecipeBase().getServings(),
+                            validateRecipeSaveRequest.getRecipeBase().getImage(),
+                            now.getTime());
+                    iRecipeBaseDao.save(recipeBase);
+
+                    RecipeDetail recipeDetail = new RecipeDetail(
+                            validateRecipeSaveRequest.getRecipeDetail().getVegetarian(),
+                            validateRecipeSaveRequest.getRecipeDetail().getVegan(),
+                            validateRecipeSaveRequest.getRecipeDetail().getGlutenFree(),
+                            validateRecipeSaveRequest.getRecipeDetail().getDairyFree(),
+                            validateRecipeSaveRequest.getRecipeDetail().getVeryHealthy(),
+                            validateRecipeSaveRequest.getRecipeDetail().getCheap(),
+                            validateRecipeSaveRequest.getRecipeDetail().getVeryPopular(),
+                            validateRecipeSaveRequest.getRecipeDetail().getSustainable(),
+                            validateRecipeSaveRequest.getRecipeDetail().getLowFodmap(),
+                            validateRecipeSaveRequest.getRecipeDetail().getWeightWatcherSmartPoints(),
+                            validateRecipeSaveRequest.getRecipeDetail().getGaps(),
+                            validateRecipeSaveRequest.getRecipeDetail().getPreparationInMinutes(),
+                            validateRecipeSaveRequest.getRecipeDetail().getCookingMinutes(),
+                            validateRecipeSaveRequest.getRecipeDetail().getSourceUrl(),
+                            null,
+                            validateRecipeSaveRequest.getRecipeDetail().getAggregateLikes(),
+                            validateRecipeSaveRequest.getRecipeDetail().getPopularityScore(),
+                            validateRecipeSaveRequest.getRecipeDetail().getHealthScore(),
+                            validateRecipeSaveRequest.getRecipeDetail().getCreditsText(),
+                            validateRecipeSaveRequest.getRecipeDetail().getSourceName(),
+                            validateRecipeSaveRequest.getRecipeDetail().getPricePerServing(),
+                            validateRecipeSaveRequest.getRecipeDetail().getTitle(),
+                            validateRecipeSaveRequest.getRecipeDetail().getReadyInMinutes(),
+                            validateRecipeSaveRequest.getRecipeDetail().getServings(),
+                            validateRecipeSaveRequest.getRecipeDetail().getImage(),
+                            validateRecipeSaveRequest.getRecipeDetail().getImageType(),
+                            validateRecipeSaveRequest.getRecipeDetail().getSummary(),
+                            validateRecipeSaveRequest.getRecipeDetail().getInstructions(),
+                            validateRecipeSaveRequest.getRecipeDetail().getOriginalId(),
+                            recipeBase);
+                    iRecipeDetailDao.save(recipeDetail);
+
+                    List<RecipeDetailDishTypes> recipeDetailDishTypesList = setRecipeDetailDishTypes(
+                            recipeDetail, validateRecipeSaveRequest);
+
+                    List<RecipeDetailCuisines> recipeDetailCuisines = setRecipeDetailCuisines(
+                            recipeDetail, validateRecipeSaveRequest);
+
+                    List<RecipeDetailIngredients> recipeDetailIngredientsList = setRecipeDetailIngredients(
+                            recipeDetail, validateRecipeSaveRequest);
+
+                    long recipeOptionId = getRecipeOptionId(recipeDetail);
+                    List<RecipeDetailSteps> recipeDetailSteps = setRecipeDetailSteps(
+                            recipeDetail, validateRecipeSaveRequest, recipeOptionId);
+
+                    iRecipeDetailDao.save(recipeDetail);
+
+                    for(RecipeDetailIngredients recipeDetailIngredients: recipeDetailIngredientsList)
+                    {
+                        Ingredient ingredient = recipeDetailIngredients.getIngredient();
+                        com.tsilva.springFood.controller.apiServer.contract.recipeSaveRequest.Ingredient saveIngredient
+                                = ingredient.getSaveIngredient();
+
+                        List<IngredientMetas> ingredientMetas = setIngredientMetas(
+                                ingredient, saveIngredient);
+
+                        List<IngredientMetaInformations> ingredientMetaInformations =
+                                setIngredientMetaInformations(ingredient, saveIngredient);
+
+                        Measure measure = setMeasure(ingredient, saveIngredient);
+
+                        iIngredientDao.save(ingredient);
+                    }
+                }
+                else
+                {
+                    LOG.debug("Couldn't save recipe. RecipeSaveRequest already exists.");
+
+                    return false;
+                }
+            }
+            else
+            {
+                LOG.debug("Couldn't save recipe. RecipeSaveRequest data not valid.");
+
+                return false;
+            }
+        }
+        catch (NullAttributeException e)
+        {
+            LOG.debug("Couldn't save recipe. RecipeSaveRequest is not valid.");
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private List<RecipeDetailDishTypes> setRecipeDetailDishTypes(
+            @NonNull RecipeDetail recipeDetail,
+            @NonNull RecipeSaveRequest validateRecipeSaveRequest)
+    {
+        if(validateRecipeSaveRequest.getRecipeDetail().getDishTypes() == null)
+        {
+            return null;
+        }
+
+        List<RecipeDetailDishTypes> recipeDetailDishTypesList = new LinkedList<>();
+        for(String dishType: validateRecipeSaveRequest.getRecipeDetail().getDishTypes())
+        {
+            if(dishType != null)
+            {
+                recipeDetailDishTypesList.add(new RecipeDetailDishTypes(recipeDetail, new DishType(dishType)));
+            }
+        }
+        recipeDetail.setRecipeDetailDishTypes(recipeDetailDishTypesList);
+
+        return recipeDetailDishTypesList;
+    }
+
+    private List<RecipeDetailCuisines> setRecipeDetailCuisines(
+            @NonNull RecipeDetail recipeDetail,
+            @NonNull RecipeSaveRequest validateRecipeSaveRequest)
+    {
+        if(validateRecipeSaveRequest.getRecipeDetail().getCuisines() == null)
+        {
+            return null;
+        }
+
+        List<RecipeDetailCuisines> recipeDetailCuisines = new LinkedList<>();
+        for(String cuisine: validateRecipeSaveRequest.getRecipeDetail().getCuisines())
+        {
+            if(cuisine != null)
+            {
+                recipeDetailCuisines.add(new RecipeDetailCuisines(recipeDetail, new Cuisine(cuisine)));
+            }
+        }
+        recipeDetail.setRecipeDetailCuisines(recipeDetailCuisines);
+
+        return recipeDetailCuisines;
+    }
+
+    private List<RecipeDetailIngredients> setRecipeDetailIngredients(
+            @NonNull RecipeDetail recipeDetail,
+            @NonNull RecipeSaveRequest validateRecipeSaveRequest)
+    {
+        List<RecipeDetailIngredients> recipeDetailIngredients = new LinkedList<>();
+        for(com.tsilva.springFood.controller.apiServer.contract.recipeSaveRequest.Ingredient ingredient:
+                validateRecipeSaveRequest.getRecipeDetail().getIngredients())
+        {
+            Long id = null;
+            String aisle = null;
+            if(ingredient.getAisle() != null)
+            {
+                aisle = ingredient.getAisle();
+            }
+            String image = null;
+            if(ingredient.getImage() != null)
+            {
+                image = ingredient.getImage();
+            }
+            String consistency = null;
+            if(ingredient.getConsistency() != null)
+            {
+                consistency = ingredient.getConsistency();
+            }
+            String name = ingredient.getName();
+            String original = null;
+            if(ingredient.getOriginal() != null)
+            {
+                original = ingredient.getOriginal();
+            }
+            String originalString = null;
+            if(ingredient.getOriginalString() != null)
+            {
+                originalString = ingredient.getOriginalString();
+            }
+            String originalName = null;
+            if(ingredient.getOriginalName() != null)
+            {
+                originalName = ingredient.getOriginalName();
+            }
+            Double amount = null;
+            if(ingredient.getAmount() != null)
+            {
+                amount = ingredient.getAmount();
+            }
+            String unit = null;
+            if(ingredient.getUnit() != null)
+            {
+                unit = ingredient.getUnit();
+            }
+
+            recipeDetailIngredients.add(
+                    new RecipeDetailIngredients(recipeDetail,
+                            new Ingredient(id, aisle, image, consistency, name, original, originalString, originalName,
+                                    amount, unit, ingredient)));
+        }
+        recipeDetail.setRecipeDetailIngredients(recipeDetailIngredients);
+
+        return recipeDetailIngredients;
+    }
+
+    private List<RecipeDetailSteps> setRecipeDetailSteps(
+            @NonNull RecipeDetail recipeDetail,
+            @NonNull RecipeSaveRequest validateRecipeSaveRequest,
+            long recipeOptionId)
+    {
+        List<RecipeDetailSteps> recipeDetailSteps = new LinkedList<>();
+        for(List<com.tsilva.springFood.controller.apiServer.contract.recipeSaveRequest.Step> stepList:
+                validateRecipeSaveRequest.getRecipeDetail().getStepOptionList())
+        {
+            for(com.tsilva.springFood.controller.apiServer.contract.recipeSaveRequest.Step step: stepList)
+            {
+                Long lengthNumber = null;
+                String lengthUnit = null;
+                if(step.getLengthNumber() != null && step.getLengthUnit() != null)
+                {
+                    lengthNumber = step.getLengthNumber();
+                    lengthUnit = step.getLengthUnit();
+                }
+                recipeDetailSteps.add(new RecipeDetailSteps(recipeOptionId, recipeDetail,
+                        new Step(step.getNumber(), step.getStep(), lengthNumber, lengthUnit)));
+            }
+            recipeOptionId++;
+        }
+        recipeDetail.setRecipeDetailSteps(recipeDetailSteps);
+
+        return recipeDetailSteps;
+    }
+
+    private List<IngredientMetas> setIngredientMetas(
+            @NonNull Ingredient ingredient,
+            @NonNull com.tsilva.springFood.controller.apiServer.contract.recipeSaveRequest.Ingredient saveIngredient)
+    {
+        if(saveIngredient.getIngredientMetaList() == null)
+        {
+            return null;
+        }
+
+        List<IngredientMetas> ingredientMetas = new LinkedList<>();
+        for(String meta: saveIngredient.getIngredientMetaList())
+        {
+            if(meta != null)
+            {
+                ingredientMetas.add(new IngredientMetas(meta, ingredient));
+            }
+        }
+        ingredient.setIngredientMetas(ingredientMetas);
+
+        return ingredientMetas;
+    }
+
+    private List<IngredientMetaInformations> setIngredientMetaInformations(
+            @NonNull Ingredient ingredient,
+            @NonNull com.tsilva.springFood.controller.apiServer.contract.recipeSaveRequest.Ingredient saveIngredient)
+    {
+        if(saveIngredient.getIngredientMetaInformationList() == null)
+        {
+            return null;
+        }
+
+        List<IngredientMetaInformations> ingredientMetaInformations = new LinkedList<>();
+        for(String metaInformation: saveIngredient.getIngredientMetaInformationList())
+        {
+            if(metaInformation != null)
+            {
+                ingredientMetaInformations.add(new IngredientMetaInformations(metaInformation, ingredient));
+            }
+        }
+        ingredient.setIngredientMetaInformations(ingredientMetaInformations);
+
+        return ingredientMetaInformations;
+    }
+
+    /**
+     *
+     * @return {@code null} if data is not valid
+     */
+    @Nullable
+    private Measure setMeasure(
+            @NonNull Ingredient ingredient,
+            @NonNull com.tsilva.springFood.controller.apiServer.contract.recipeSaveRequest.Ingredient saveIngredient)
+    {
+        if(saveIngredient.getMeasure() == null)
+        {
+            return null;
+        }
+
+        String unitShort = null;
+        if(saveIngredient.getMeasure().getUnitShort() != null)
+        {
+            unitShort = saveIngredient.getMeasure().getUnitShort();
+        }
+        String unitLong = null;
+        if(saveIngredient.getMeasure().getUnitLong() != null)
+        {
+            unitLong = saveIngredient.getMeasure().getUnitLong();
+        }
+        String usUnitShort = null;
+        if(saveIngredient.getMeasure().getImpUnitShort() != null)
+        {
+            usUnitShort = saveIngredient.getMeasure().getImpUnitShort();
+        }
+        String usUnitLong = null;
+        if(saveIngredient.getMeasure().getImpUnitLong() != null)
+        {
+            usUnitLong = saveIngredient.getMeasure().getImpUnitLong();
         }
 
         Measure measure = new Measure(unitShort, unitLong, usUnitShort, usUnitLong, ingredient);

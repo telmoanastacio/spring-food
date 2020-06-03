@@ -23,10 +23,16 @@ public class  RecipeBaseResponse implements Serializable
 
     public RecipeBaseResponse(@NonNull RecipeBase recipeBase)
     {
-        if(recipeBase.getId() != null && recipeBase.getSpoonacularId() != null && recipeBase.getTitle() != null)
+        if(recipeBase.getId() != null && recipeBase.getTitle() != null)
         {
+            Long spoonacularId = null;
+            if(recipeBase.getSpoonacularId() != null)
+            {
+                spoonacularId = recipeBase.getSpoonacularId();
+            }
+            this.spoonacularId = spoonacularId;
+
             this.id = recipeBase.getId();
-            this.spoonacularId = recipeBase.getSpoonacularId();
             this.title = recipeBase.getTitle();
             this.readyInMinutes = recipeBase.getReadyInMinutes();
             this.servings = recipeBase.getServings();
