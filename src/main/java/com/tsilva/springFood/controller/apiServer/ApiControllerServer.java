@@ -50,6 +50,11 @@ public class ApiControllerServer implements ApplicationListener<FindByRecipeName
     @Autowired
     private IIngredientDao iIngredientDao;
 
+    /**
+     *
+     * @param searchTypeInt if 1 will use recipeName as ingredient name for the search instead
+     * @return
+     */
     @RequestMapping(value = "/recipes/{recipeName}", method = RequestMethod.GET)
     public DeferredResult<RecipeBaseSearchResponse> recipeMapping(
             @PathVariable(name = "recipeName") String recipeName,
