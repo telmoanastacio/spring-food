@@ -5,6 +5,12 @@ This is a non Spring Boot configuration of an example server that uses HIBERNATE
 It is focused in recipes.
 It uses a Spoonacular api client to get recipes, besides the possibility to add new recipes.
 
+MySql 8.0.19 is used.
+
+Sql database script can be found in "spring-food.sql" file.
+
+Properties relating to persistence can be found in the file "persistence-mysql.properties".
+
 ## instructions
 
 The server can be started very conveniently trough the Maven command from the IDE:
