@@ -59,7 +59,7 @@ curl --location --request POST 'http://localhost:8081/logout' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --data-urlencode '_csrf=[take this token from index.html]'
 
--delete account processing: @POST localhost:8081/delete-account (must be logged in first - very basic mechanism)
+-delete account processing: @POST localhost:8081/delete-account (must be logged in first - only "ADMIN" role can delete other accounts)
 
 example request:
 

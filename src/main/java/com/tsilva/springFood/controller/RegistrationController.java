@@ -3,10 +3,13 @@ package com.tsilva.springFood.controller;
 import com.tsilva.springFood.entity.User;
 import com.tsilva.springFood.service.IUserService;
 import com.tsilva.springFood.user.CrmUser;
+import com.tsilva.springFood.utils.AuthorityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.WebDataBinder;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -82,6 +86,16 @@ public class RegistrationController
 			HttpServletResponse response)
 	{
 		LOG.info("deleteAccountMapping(): Processing deletion form for: " + userName);
+
+		UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		List<String> authorityList = AuthorityUtils.getUserAuthorities(userDetails);
+
+		if(authorityList == null
+				|| (!authorityList.contains("ADMIN") && !userDetails.getUsername().equals(userName)))
+		{
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
 
 		// check the database if user already exists
 		User user = userService.findByUserName(userName);

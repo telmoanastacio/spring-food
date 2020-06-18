@@ -52,6 +52,7 @@ public class AuthenticationHandler implements AuthenticationSuccessHandler, Auth
 
 		CsrfToken csrfToken = (CsrfToken) request.getAttribute("_csrf");
 		response.setHeader("_csrf", csrfToken.getToken());
+		response.setHeader("AUTHORITY", request.getAuthType());
 	}
 
 	@Override
