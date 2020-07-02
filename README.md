@@ -25,7 +25,7 @@ endpoint: localhost:8081
 ##
 services are protected by Spring Security against CSRF
 ##
--index: @GET localhost:8081/ (redirect to localhost:8081/index.html);
+-index: @GET localhost:8081/ (redirect to localhost:8081/index.html)
 
 -login processing: @POST localhost:8081/authenticate
 
@@ -67,6 +67,12 @@ curl --location --request POST 'http://localhost:8081/delete-account' \
 --header 'Content-Type: application/x-www-form-urlencoded' \
 --data-urlencode 'username=user' \
 --data-urlencode '_csrf=[take this token from index.html]'
+
+-image resources: @GET localhost:8081/res/{resourceName}.{fileExtension} (must be logged in, file available in res directory and file extension valid)
+
+example request:
+
+curl --location --request GET 'http://localhost:8081/res/dish-with-crowd-ico.png' \
 
 ##
 ### api service locations

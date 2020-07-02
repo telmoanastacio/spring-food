@@ -14,6 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by Telmo Silva on 28.04.2020.
@@ -22,6 +24,18 @@ import java.io.OutputStream;
 public class ResponseUtils
 {
     private static final Logger LOG = LoggerFactory.getLogger(ResponseUtils.class);
+    private static Map<String, MediaType> supportedImageFileMediaTypeMap = null;
+
+    static
+    {
+        supportedImageFileMediaTypeMap = new HashMap<>();
+        supportedImageFileMediaTypeMap.put("png", MediaType.IMAGE_PNG);
+        supportedImageFileMediaTypeMap.put("jpg", MediaType.IMAGE_JPEG);
+        supportedImageFileMediaTypeMap.put("jpeg", MediaType.IMAGE_JPEG);
+        supportedImageFileMediaTypeMap.put("jpe", MediaType.IMAGE_JPEG);
+        supportedImageFileMediaTypeMap.put("jfif", MediaType.IMAGE_JPEG);
+        supportedImageFileMediaTypeMap.put("gif", MediaType.IMAGE_GIF);
+    }
 
     public static void streamHtml(HttpServletResponse response, String htmlStr)
     {
@@ -190,6 +204,92 @@ public class ResponseUtils
             catch (IOException e)
             {
                 LOG.debug("streamObjectAsJson()", e);
+            }
+        }
+    }
+
+    public static void streamImage(
+            HttpServletResponse response,
+            ServletContext servletContext,
+            String resourceName,
+            String fileExtension)
+    {
+        if(response == null || servletContext == null)
+        {
+            LOG.debug("streamImage(): Invalid HttpServletResponse or ServletContext");
+            return;
+        }
+
+        if(resourceName == null || resourceName.isEmpty())
+        {
+            LOG.debug("streamImage(): Invalid resourceName");
+            return;
+        }
+
+        if(fileExtension == null || fileExtension.isEmpty())
+        {
+            LOG.debug("streamImage(): Invalid fileExtension");
+            return;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("");
+        sb.append("/res/");
+        sb.append(resourceName);
+        sb.append(".");
+        sb.append(fileExtension);
+
+        InputStream is = null;
+        OutputStream os = null;
+        try
+        {
+            is = servletContext.getResourceAsStream(sb.toString());
+            if(is == null)
+            {
+                LOG.debug("streamImage(): No file exists at the specified path -> " + sb.toString());
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+            os = response.getOutputStream();
+            MediaType mediaType = supportedImageFileMediaTypeMap.get(fileExtension);
+            if(mediaType == null)
+            {
+                LOG.debug("streamImage(): Media type not supported -> ." + fileExtension);
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+            response.setContentType(mediaType.getType());
+            response.setStatus(HttpServletResponse.SC_ACCEPTED);
+            StreamUtils.copy(is, os);
+        }
+        catch(IOException e)
+        {
+            LOG.debug("streamImage()", e);
+        }
+        finally
+        {
+            if(is != null)
+            {
+                try
+                {
+                    is.close();
+                }
+                catch(IOException e)
+                {
+                    LOG.debug("streamImage()", e);
+                }
+            }
+
+            if(os != null)
+            {
+                try
+                {
+                    os.close();
+                }
+                catch(IOException e)
+                {
+                    LOG.debug("streamImage()", e);
+                }
             }
         }
     }

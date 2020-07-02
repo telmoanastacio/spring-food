@@ -2,6 +2,8 @@ package com.tsilva.springFood.utils;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StreamUtils;
 
 import javax.servlet.ServletContext;
@@ -15,6 +17,8 @@ import java.nio.charset.StandardCharsets;
 
 public class ResourceUtils
 {
+    private static final Logger LOG = LoggerFactory.getLogger(ResourceUtils.class);
+
     public static Document readHtmlFileToDocument(ServletContext servletContext, String path)
     {
         String htmlStr = "";
@@ -24,9 +28,9 @@ public class ResourceUtils
             is = servletContext.getResourceAsStream(path);
             htmlStr = StreamUtils.copyToString(is, StandardCharsets.UTF_8);
         }
-        catch (IOException e)
+        catch(IOException e)
         {
-            e.printStackTrace();
+            LOG.debug("readHtmlFileToDocument()", e);
         }
         finally
         {
@@ -37,9 +41,9 @@ public class ResourceUtils
                     is.close();
                 }
             }
-            catch (IOException e)
+            catch(IOException e)
             {
-                e.printStackTrace();
+                LOG.debug("readHtmlFileToDocument()", e);
             }
         }
         return Jsoup.parse(htmlStr);

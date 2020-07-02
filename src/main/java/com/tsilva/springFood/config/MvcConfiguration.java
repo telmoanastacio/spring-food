@@ -49,6 +49,7 @@ public class MvcConfiguration implements WebMvcConfigurer
 		registry.addResourceHandler("/**/*.htm").addResourceLocations("/angular/");
 		registry.addResourceHandler("/**/*.html").addResourceLocations("/angular/");
 		registry.addResourceHandler("/**/*.js").addResourceLocations("/angular/");
+		registry.addResourceHandler("/**/*.js.map").addResourceLocations("/angular/");
 		registry.addResourceHandler("/**/*.css").addResourceLocations("/angular/");
 	}
 
