@@ -22,7 +22,7 @@
 		<springsecurity.version>5.3.1.RELEASE</springsecurity.version>
 		<javax.annotation-api.version>1.3.2</javax.annotation-api.version>
 		<cglib.version>3.3.0</cglib.version>
-		<hibernate.version>5.4.14.Final</hibernate.version>
+		<hibernate.version>5.4.24.Final</hibernate.version>
 		<mysql-connector-java.version>8.0.19</mysql-connector-java.version>
 		<c3p0.version>0.9.5.5</c3p0.version>
 		<javax.servlet-api.version>4.0.1</javax.servlet-api.version>
